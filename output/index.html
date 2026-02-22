@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>播客纪要</title>
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", sans-serif;
+    background: #f5f5f0;
+    color: #2c2c2c;
+    line-height: 1.8;
+}
+
+.container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+}
+
+/* 导航栏 */
+.nav {
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 16px 24px;
+    margin-bottom: 40px;
+}
+.nav a {
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+}
+.nav a:hover { color: #000; }
+
+/* 标题 */
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #111;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e8e8e8;
+    color: #111;
+}
+
+h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* 正文 */
+p {
+    margin-bottom: 14px;
+    color: #3a3a3a;
+}
+
+ul, ol {
+    margin-bottom: 14px;
+    padding-left: 24px;
+}
+
+li {
+    margin-bottom: 6px;
+    color: #3a3a3a;
+}
+
+/* 引用块 */
+blockquote {
+    border-left: 3px solid #aaa;
+    margin: 20px 0;
+    padding: 12px 20px;
+    background: #fafafa;
+    color: #555;
+    font-style: italic;
+}
+
+/* 重点高亮 */
+strong {
+    color: #111;
+    font-weight: 600;
+}
+
+/* 元数据 */
+.meta {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 全集重点区域 */
+.highlights {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+}
+.highlights h2 {
+    border: none;
+    margin-top: 0;
+    font-size: 17px;
+    color: #444;
+    letter-spacing: 0.02em;
+}
+
+/* 索引页卡片 */
+.card-grid {
+    display: grid;
+    gap: 20px;
+    margin-top: 32px;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 24px 28px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: box-shadow 0.15s;
+}
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.card h3 {
+    margin-top: 0;
+    font-size: 17px;
+    color: #111;
+}
+.card .card-meta {
+    font-size: 12px;
+    color: #999;
+    margin-top: 8px;
+}
+.card .card-dates {
+    font-size: 11px;
+    color: #bbb;
+    margin-top: 6px;
+}
+
+/* 分隔线 */
+hr {
+    border: none;
+    border-top: 1px solid #e8e8e8;
+    margin: 36px 0;
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>播客纪要</h1>
+    <p style="color:#888; margin-top:8px;">共 3 篇</p>
+    <div class="card-grid">
+      
+    <a class="card" href="dario-amodei-dwarkesh-podcast.html">
+      <h3>Dario Amodei：数据中心里的天才国度——从 AGI 时间线到全球治理</h3>
+      <div class="card-meta">Dwarkesh Podcast | Dario Amodei（Anthropic CEO）| 2026</div>
+      <div class="card-dates">原文发表：Feb 13, 2026 &nbsp;·&nbsp; 纪要生成：2026-02-22</div>
+    </a>
+    <a class="card" href="how-claude-code-works-jared-zoneraich-promptlayer.html">
+      <h3>Claude Code 是如何工作的——Jared Zoneraich，PromptLayer</h3>
+      <div class="card-meta">YouTube | Jared Zoneraich（PromptLayer 创始人）| NYC AI Engineering Workshop 压轴场</div>
+      <div class="card-dates">原文发表：Dec 26, 2025 &nbsp;·&nbsp; 纪要生成：2026-02-22</div>
+    </a>
+    <a class="card" href="jeff-dean-latent-space.html">
+      <h3>Jeff Dean：从 Google 搜索到 Gemini，亲历 AI 基础设施三十年</h3>
+      <div class="card-meta">Latent Space | Jeff Dean（Google Chief AI Scientist）| 2025</div>
+      <div class="card-dates">原文发表：Feb 13, 2026 &nbsp;·&nbsp; 纪要生成：2026-02-22</div>
+    </a>
+    </div>
+  </div>
+</body>
+</html>

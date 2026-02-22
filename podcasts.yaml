@@ -1,0 +1,12 @@
+podcasts:
+  - url: "https://www.youtube.com/watch?v=RFKCzGlAU6Q"
+    title: "How Claude Code Works - Jared Zoneraich, PromptLayer"
+
+  - url: "https://www.dwarkesh.com/p/dario-amodei-2"
+    title: "Dario Amodei - Dwarkesh Podcast"
+
+  - url: "https://www.latent.space/p/jeffdean"
+    title: "Jeff Dean - Latent Space"
+
+  - url: "https://lexfridman.com/peter-steinberger-transcript"
+    title: "Peter Steinberger - Lex Fridman"

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dario Amodei：数据中心里的天才国度——从 AGI 时间线到全球治理</title>
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+                 "Microsoft YaHei", sans-serif;
+    background: #f5f5f0;
+    color: #2c2c2c;
+    line-height: 1.8;
+}
+
+.container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+}
+
+/* 导航栏 */
+.nav {
+    background: #fff;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 16px 24px;
+    margin-bottom: 40px;
+}
+.nav a {
+    color: #555;
+    text-decoration: none;
+    font-size: 14px;
+}
+.nav a:hover { color: #000; }
+
+/* 标题 */
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    color: #111;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e8e8e8;
+    color: #111;
+}
+
+h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* 正文 */
+p {
+    margin-bottom: 14px;
+    color: #3a3a3a;
+}
+
+ul, ol {
+    margin-bottom: 14px;
+    padding-left: 24px;
+}
+
+li {
+    margin-bottom: 6px;
+    color: #3a3a3a;
+}
+
+/* 引用块 */
+blockquote {
+    border-left: 3px solid #aaa;
+    margin: 20px 0;
+    padding: 12px 20px;
+    background: #fafafa;
+    color: #555;
+    font-style: italic;
+}
+
+/* 重点高亮 */
+strong {
+    color: #111;
+    font-weight: 600;
+}
+
+/* 元数据 */
+.meta {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 全集重点区域 */
+.highlights {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 40px;
+}
+.highlights h2 {
+    border: none;
+    margin-top: 0;
+    font-size: 17px;
+    color: #444;
+    letter-spacing: 0.02em;
+}
+
+/* 索引页卡片 */
+.card-grid {
+    display: grid;
+    gap: 20px;
+    margin-top: 32px;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 24px 28px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: box-shadow 0.15s;
+}
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.card h3 {
+    margin-top: 0;
+    font-size: 17px;
+    color: #111;
+}
+.card .card-meta {
+    font-size: 12px;
+    color: #999;
+    margin-top: 8px;
+}
+.card .card-dates {
+    font-size: 11px;
+    color: #bbb;
+    margin-top: 6px;
+}
+
+/* 分隔线 */
+hr {
+    border: none;
+    border-top: 1px solid #e8e8e8;
+    margin: 36px 0;
+}
+</style>
+</head>
+<body>
+  <div class="nav">
+    <a href="index.html">← 返回目录</a>
+  </div>
+  <div class="container">
+    <p><a href="https://www.dwarkesh.com/p/dario-amodei-2">▶ 原文链接</a></p>
+<h1>Dario Amodei：数据中心里的天才国度——从 AGI 时间线到全球治理</h1>
+<p><strong>来源：</strong> Dwarkesh Podcast | Dario Amodei（Anthropic CEO）| 2026
+<strong>原文发表：</strong> Feb 13, 2026
+<strong>纪要生成：</strong> 2026-02-22</p>
+<hr />
+<div class="highlights"><h2>全集重点</h2>
+<ul>
+<li><strong>"大计算团假设"十年不变</strong>：Dario 在 2017 年提出的核心假设至今成立——规模、数据、目标函数才是决定因素，所有"需要新方法"的聪明都不那么重要；RL 扩展与预训练扩展遵循同样的规律</li>
+<li><strong>"数据中心里的天才国度"：90% 确定、1-3 年内</strong>：Dario 预测 10 年内 AGI 达到 90% 概率，其中 1-3 年达到"天才国度"级别是他的直觉（约 50/50）；已验证任务（代码、数学）更确定，不可验证任务有少量残余不确定性</li>
+<li><strong>扩散是真实的，但远快于历史先例</strong>：AI 技术扩散遵循"快但不是无限快"的指数——Anthropic 每年营收 10 倍增长，但企业采购仍需 legal/security/change management；经济价值的释放有滞后</li>
+<li><strong>AI 实验室的盈利逻辑：需求预测问题，非商业模式问题</strong>：每个模型本身盈利（70%+ 毛利率），但公司亏损是因为以指数速度提前采购算力；2028 年盈利预期来自扩张速度放缓而非业务收缩</li>
+<li><strong>AGI 治理：联邦标准优于州法拼盘，民主国家需先于威权掌握"关键时刻"</strong>：Dario 支持联邦层面主导监管（而非 10 年封禁州法），忧虑威权政府在 AI 加持下变得更难推翻；AI 宪法应通过竞争性迭代而非独家制定</li>
+</ul>
+<hr />
+</div><h2>嘉宾/话题简介</h2>
+<p>Dario Amodei 是 Anthropic 的 CEO 和联合创始人，此前曾任 OpenAI 研究副总裁。他是 Anthropic Claude 系列模型的核心设计者，也是近期"《科技的青春期》"（The Adolescence of Technology）等长文的作者。本集是他与 Dwarkesh Patel 时隔三年的第二次深度对话，覆盖了 AI 扩展假设的当前状态、AGI 时间线、经济扩散的速度、AI 实验室的商业模式、监管挑战、美中芯片竞争，以及 Anthropic 内部的文化管理——是一场罕见的将技术判断、经济学推理和地缘政治视角完整融合的对话。</p>
+<hr />
+<h2>分节详述</h2>
+<h3>00:00:00 我们究竟在扩展什么？</h3>
+<p><strong>本节重点</strong>
+- Dario 的"大计算团假设"（Big Blob of Compute Hypothesis）从 2017 年至今未变，列出七个真正重要的变量
+- RL 扩展与预训练扩展遵循完全相同的规律（对数线性，log-linear）
+- 预训练是"介于人类进化和人类学习之间"的过程，不该直接与人类样本效率对比</p>
+<p><strong>详细精要</strong></p>
+<p>Dwarkesh 开场提问：三年前两人对话时，规模定律（scaling laws）是明确可见的公开趋势；现在 RL 扩展没有公开的缩放律，机制也不清晰——"我们究竟在扩展什么"？</p>
+<p><strong>Dario 的核心答案：七个真正重要的变量</strong></p>
+<p>Dario 回顾他在 2017 年（GPT-1 刚发布）写的一份内部文件，称之为"大计算团假设"（Big Blob of Compute Hypothesis）。那份文件的核心论断是：所有的"聪明"——新的方法、新的技术——并不那么重要。真正重要的只有七类变量：</p>
+<ol>
+<li><strong>原始计算量</strong>（compute）</li>
+<li><strong>数据的数量</strong></li>
+<li><strong>数据的质量和分布</strong>（需要宽分布）</li>
+<li><strong>训练时长</strong></li>
+<li><strong>目标函数的可扩展性</strong>——预训练的"预测下一个 token"和 RL 的"到达目标"都是可以扩展到月亮的目标函数；其中还分为"客观奖励"（数学、编程中的验证性奖励）和"主观奖励"（RLHF 及其升级版）</li>
+<li><strong>归一化/条件化技术</strong>——确保计算流是"层流"（laminar）而非遭遇数值不稳定</li>
+<li><strong>第七个因素</strong>（类似归一化）</li>
+</ol>
+<p>Rich Sutton 在 2019 年发表的《苦涩教训》（The Bitter Lesson）与这个假设本质上相同。Dario 认为，到目前为止，几乎没有看到任何不符合这一假设的现象。</p>
+<p><strong>RL 扩展与预训练扩展是同一件事</strong></p>
+<p>预训练扩展律是清晰可见的——随着计算量增加，损失以幂律下降。现在我们在 RL 阶段看到完全相同的规律：在数学竞赛（AIME 等）、代码，以及越来越广泛的 RL 任务上，模型表现对训练时长都是对数线性的。Dario 说这"不只是数学竞赛"，而是"各种各样的 RL 任务"。</p>
+<p><strong>预训练不等于人类学习：进化的类比</strong></p>
+<p>Dwarkesh 引用 Rich Sutton 的质疑：如果一个系统真的具备"人类学习的核心"，就不需要数万亿 token 才能学会用 Excel。Dario 的回应：预训练不是人类学习，而是<strong>介于人类进化和人类学习之间的某种东西</strong>。</p>
+<ul>
+<li>人类的大脑并非白板——进化已经预装了大量先验（视觉区、语言区与各类输入输出的连接）</li>
+<li>语言模型确实更像白板，权重从随机初始化</li>
+<li>因此，预训练应被理解为一种"跨越进化和学习之间的中间过程"</li>
+</ul>
+<p>同样地，in-context learning（上下文学习）是介于长期人类学习和短期人类学习之间的某个点。整个层级是：进化→长期学习→短期学习→即时反应；LLM 的几个阶段分布在这条谱上，但不一定与人类的点精确对应。</p>
+<p>关键结论：<strong>样本效率的差异是真实存在的，但可能不重要</strong>。即使模型需要更多训练数据，一旦训练完成，它就拥有了所有那些知识和技能——就像人类的先验知识是通过进化"免费"获得的一样。</p>
+<blockquote>
+<p>💬 <strong>精华片段</strong></p>
+<p>假设是完全一样的：所有的聪明、所有的技术、所有的"我们需要一种新方法来做某事"——这些都不那么重要。只有几样东西真正重要。</p>
+<p><em>"The hypothesis is basically the same. What it says is that all the cleverness, all the techniques, all the 'we need a new method to do something', that doesn't matter very much. There are only a few things that matter."</em></p>
+</blockquote>
+<hr />
+<h3>00:12:36 扩散是"自我安慰"吗？AGI 时间线与经济扩散的速度</h3>
+<p><strong>本节重点</strong>
+- "天才国度"10 年内：90% 概率；1-3 年内：约 50% 直觉判断
+- 不可验证任务（写小说、规划火星任务）有少量残余不确定性，已验证任务（代码）接近确定
+- 经济扩散是真实的，但速度远超历史先例——不是"快不了"，而是"快但不是无限快"
+- Anthropic 每年营收 10 倍增长，2025 年 1 月单月新增数十亿美元</p>
+<p><strong>详细精要</strong></p>
+<p>Dwarkesh 问的核心问题：你凭什么认为是"一年"而不是"十年"？</p>
+<p><strong>Dario 的两层概率</strong></p>
+<ul>
+<li>
+<p><strong>弱主张（10 年内的"天才国度"）</strong>：Dario 给出 90% 的概率——他认为"在 2035 年之前不会发生"是极端错误的观点，在任何理性的世界里都应该是非主流。剩余 5-10% 的不确定性来自"台湾被入侵、晶圆厂被炸毁"等黑天鹅事件。</p>
+</li>
+<li>
+<p><strong>强主张（1-3 年内）</strong>：这是 Dario 的"直觉"（hunch），他给大约 50% 的概率。对于已验证的任务（特别是编程），他甚至说"除了那种不可化简的不确定性，一两年内我们肯定会到达那里"。</p>
+</li>
+</ul>
+<p><strong>可验证 vs 不可验证的分界线</strong></p>
+<p>Dario 对"天才国度"存有唯一的根本不确定性：不可验证的任务。规划火星任务、做出 CRISPR 级别的基础科学发现、写一部小说——这些任务很难评估"完成了没有"。他几乎确信有可靠路径到达那里，但如果有任何残余不确定性，就在这里。</p>
+<p><strong>关于经济扩散：不是"借口"，是真实约束</strong></p>
+<p>Dwarkesh 提出一个"犀利"观点：扩散不应该是 AI 的问题——AI 可以在几分钟内读完整个 Slack 和 Google Drive；你可以雇用一个经过验证的 AI 的多个副本；不存在逆向选择问题。相比之下，雇佣人类麻烦得多，但我们仍然每年支付 50 万亿美元的工资。</p>
+<p>Dario 的回应区分了两件事：
+1. <strong>扩散是"限制因素"的错误理解</strong>：他不是说扩散会阻止 AI 产生影响，而是说扩散会让影响不是立即发生。
+2. <strong>真实的约束来源</strong>：大企业需要通过法律审查、安全合规、安全权限配置、向 CEO 解释为何值得花 5000 万等等。Anthropic 每天都在与这些对话。</p>
+<p><strong>Anthropic 的营收数据作为证据</strong></p>
+<p>Dario 分享了 Anthropic 的营收曲线：
+- 2023 年：0 → 1 亿美元
+- 2024 年：1 亿 → 10 亿美元
+- 2025 年：10 亿 → 90-100 亿美元
+- 2026 年 1 月：单月新增数十亿美元</p>
+<p>这是每年约 10 倍的增长。这个曲线最终会放缓（GDP 是有限的），但 Dario 认为即使在数千亿量级，也会保持"相当快"。他总结说：<strong>技术能力指数 + 经济扩散指数 = 两个都快，但都不是无限快</strong>。</p>
+<blockquote>
+<p>💬 <strong>精华片段</strong></p>
+<p>我们应该在一个中间世界里思考——事情极其快速，但不是瞬间发生。它需要时间，因为经济扩散，因为需要关闭回路……在 Anthropic 内部，当我看向我们的客户时：快速采用，但不是无限快。</p>
+<p><em>"I think we should be thinking about this middle world where things are extremely fast, but not instant, where they take time because of economic diffusion, because of the need to close the loop... Fast adoption, but not infinitely fast."</em></p>
+</blockquote>
+<hr />
+<h3>00:29:42 持续学习真的必要吗？如何解决？</h3>
+<p><strong>本节重点</strong>
+- 视频编辑的"在职学习"类比：AI 何时能做到随用随会？Dario 预测 1-3 年
+- 编程领域的生产力争议：Anthropic 内部数据明确，但外部研究显示混合结果
+- 持续学习可能根本不是瓶颈——预训练泛化 + RL 泛化可能已经足够
+- 更长的上下文窗口不是研究问题，是工程和推理问题</p>
+<p><strong>详细精要</strong></p>
+<p>Dwarkesh 以视频编辑为例——他的编辑在六个月后积累了对受众口味、他个人风格和各种权衡的深刻理解。这种"在职积累的上下文"，AI 什么时候能做到？</p>
+<p><strong>Dario 的"天才国度"路径</strong></p>
+<p>"天才国度"版本的 AI 会这样处理这个任务：对整个计算机屏幕有通用控制能力，可以喂入视频，还可以用计算机屏幕去网上查看你所有的历史采访，查看 Twitter 上对你采访的评论，与你对话、与你的工作人员对话，查看你的历史编辑记录——从这些信息中完成工作。这种能力依赖于<strong>计算机使用</strong>（computer use）的可靠性。</p>
+<p>Dario 提到，一年多前首次发布计算机使用功能时，OSWorld 基准分数约为 15%，现在已爬升到 65-70%。当可靠性达到足够高的门槛，这个任务就可以被 AI 接管。</p>
+<p><strong>编程生产力的争议</strong></p>
+<p>Dwarkesh 引用了一项研究：让有经验的开发者在熟悉的代码库上尝试关闭 pull request，他们主观上感觉更有生产力，但实际上合并的代码量下降了 20%。这个"感觉有效但数据显示无效"的矛盾如何解释？</p>
+<p>Dario 的回应非常直接：<strong>在 Anthropic 内部，这是毫无疑问的</strong>。Anthropic 面临极大的商业压力——每年 10 倍营收增长，"没有时间搞形式主义，没有时间感觉有生产力但实际上没有"。这些工具确实让我们更有生产力，体现在每隔几个月就有新模型发布。他还指出，竞争对手使用这些工具也是 Anthropic 担心的原因之一——如果这些工具是秘密在降低生产力，他们就不会有这种担心了。</p>
+<p>目前 Dario 估计，编程模型给整体带来了约 15-20% 的速度提升（六个月前约为 5%），这是一个"开始积累势头的滚雪球"。</p>
+<p><strong>持续学习：可能根本不需要</strong></p>
+<p>Dario 指出一个微妙但重要的历史规律：在 ML 领域，许多看似"不可逾越的障碍"，最终都被"大计算团"给消化了。"模型怎么追踪名词和动词""只有统计相关，没有语义理解""能理解段落，但不能理解词""有逻辑推理但做不了数学"——这些预言一个接一个地被打破。</p>
+<p>他的判断是：仅仅通过预训练泛化 + RL 泛化，就可能足以实现"天才国度"。持续学习可能根本就不是一个障碍。如果它是个障碍，他认为一两年内可以解决。</p>
+<p><strong>上下文长度：工程问题而非研究问题</strong></p>
+<p>Dwarkesh 观察到：从 GPT-3 到 GPT-4 Turbo，上下文从 2K 到 128K；但过去两年停滞了，而且质量报告称超长上下文有退化。Dario 的回应：</p>
+<ul>
+<li><strong>训练上下文 vs 服务上下文</strong>：如果训练于短上下文，再扩展到超长上下文，会有退化。如果直接在长上下文上训练，效果更好，但工程挑战更大（训练时每个 step 的 sample 数减少等）。</li>
+<li><strong>本质上是工程问题</strong>：存储完整的 KV 缓存、在 GPU 间管理内存——这些都是可以解决的工程问题，不是研究问题。</li>
+</ul>
+<blockquote>
+<p>💬 <strong>精华片段</strong></p>
+<p>实际上有一段更强的历史，证明这些东西看起来是大问题，但最终会被消解。有些是真实的。但我会把我们的论据聚焦在代码上——我认为在一两年内，模型就能端到端完成软件工程。</p>
+<p><em>"There's actually a stronger history of some of these things seeming like a big deal and then kind of dissolving... I would ground us in something like code. I think we may get to the point in a year or two where the models can just do SWE end-to-end."</em></p>
+</blockquote>
+<hr />
+<h3>00:46:20 如果 AGI 近在眼前，为什么不买更多算力？</h3>
+<p><strong>本节重点</strong>
+- 技术曲线的不确定性 vs. 经济扩散的不确定性：两者叠加使得"买多少算力"极难决策
+- 差一年就能破产：如果预期收入是 1 万亿美元而实际是 8000 亿，就倒闭了
+- Anthropic 的"负责任"指的是写下了电子表格，而非绝对金额上的保守
+- 机器人将在"天才国度"之后约一两年内被革命性改变</p>
+<p><strong>详细精要</strong></p>
+<p>Dwarkesh 提出一个精彩的逻辑悖论：Dario 预测 1-3 年内有"天才国度"，那么全知的 Nobel Prize 得奖级 AI 的 TAM（总可寻址市场）是数万亿美元——这意味着应该买尽可能多的算力。但 Anthropic 相对于 OpenAI/微软似乎在算力上更保守。这两种立场矛盾吗？</p>
+<p><strong>算力决策的极端风险</strong></p>
+<p>Dario 给出了一个具体的数字模型：如果营收以每年 10 倍速度增长，从 2026 年初的 100 亿美元出发，到 2028 年末应该是 1 万亿美元/年，五年累积就是 5 万亿。但如果他现在预购 2027 年开始交付的 1 万亿美元算力，只需收入比预期少一点（比如只有 8000 亿而非 1 万亿），或者增速是每年 5 倍而非 10 倍，或者时机偏差一年——就直接破产。"世界上没有任何对冲能阻止破产"。</p>
+<p>所以 Anthropic 的策略是：买下足以捕获强劲上行场景的算力，但不买在极端上行场景（10 万亿/年）下才合理的量。</p>
+<p><strong>"负责任"的真实含义</strong></p>
+<p>Dario 澄清他之前说的"负责任的算力扩展"：
+- <strong>不是</strong>绝对金额上比别人保守
+- <strong>是</strong>真的写下了电子表格，理解了风险；相比之下，他感觉某些其他公司是在 YOLO（随意签大额合同），没有真正做过风险测算
+- Anthropic 作为企业服务公司，有更可靠、边际更高的收入，这提供了"缓冲"——买多了损失有限，买少了可以少做一点研究</p>
+<p><strong>全行业算力曲线</strong></p>
+<p>Dario 分享了对全行业的估计：
+- 2026 年：10-15 吉瓦（GW）
+- 2027 年：30-40 吉瓦
+- 2028 年：~100 吉瓦
+- 2029 年：~300 吉瓦
+- 每吉瓦约 100-150 亿美元/年成本</p>
+<p>这样到 2028-2029 年，全行业算力支出确实接近 Dwarkesh 所说的万亿级别。Dario 认为，Anthropic 具体的数字"这些数字太小了"——意味着 Anthropic 的规模比 Dwarkesh 假设的要大。</p>
+<p><strong>机器人：天才国度之后约一两年</strong></p>
+<p>Dwarkesh 问机器人何时被 AI 革命。Dario 认为机器人的进步不依赖于"像人类一样的在职学习"——可以通过 RL 在大量游戏/模拟环境中泛化，或通过上下文学习来实现。无论哪种路径，当模型具备了这些技能，机器人将同时在两个维度被革新：设计更好（AI 比人类更擅长机器人设计），控制更好（AI 控制机器人）。时间上，"天才国度"之后再加一两年"同样的扩散滞后"。</p>
+<hr />
+<h3>00:58:49 AI 实验室如何真正盈利？</h3>
+<p><strong>本节重点</strong>
+- 每个单独模型本身是盈利的（70%+ 毛利率），公司整体亏损是因为指数扩张预付算力
+- 行业均衡：少数玩家的古诺均衡（Cournot equilibrium），利润非零非天文数字，类似云计算行业
+- Claude Code 的诞生：内部自用→发现产品市场契合→对外发布
+- API 商业模式的持久性：因为总有新的可能性需要实验，total addressable exploration space 永不饱和</p>
+<p><strong>详细精要</strong></p>
+<p>Dwarkesh 问：Anthropic 计划 2028 年盈利，而 2028 年恰好是"天才国度"的起点——这时候难道不应该继续把钱砸进去，建设更大的"天才国度"，而不是追求盈利？</p>
+<p><strong>盈利的真实逻辑：需求预测问题</strong></p>
+<p>Dario 用一个简化模型解释：</p>
+<p>假设总算力支出 100 亿/年：
+- 50 亿用于训练（研究支出）
+- 50 亿用于推理（inference）
+- 推理毛利率 &gt; 50%，假设支撑 150 亿收入
+- 如果需求预测准确，利润 = 150 亿 - 50 亿（推理成本）- 50 亿（训练成本）= 50 亿</p>
+<p>所以基础商业模型是盈利的。亏损的原因不是商业模式不成立，而是每年都在以指数速度提前采购下一年的算力。如果需求预测过高，多余算力全部用于研究，公司亏损但模型很强；如果预测过低，研究被挤压，公司盈利但竞争力减弱。</p>
+<p><strong>行业的古诺均衡</strong></p>
+<p>Dario 用经济学视角描述 AI 行业的竞争结构：
+- 少数几个玩家（类比云计算：3-4 家）
+- 进入门槛极高（需要数百亿资本 + 大量专业技能）
+- 模型高度差异化（Claude 擅长不同于 GPT，两者又不同于 Gemini，而且这种差异比云计算服务更微妙）
+- 结果：古诺均衡——利润非零，但也不是天文数字；类比云计算的状态</p>
+<p>唯一破坏这一均衡的因素：如果 AI 模型能自行构建下一代 AI，则相关技术可能扩散至整个经济，但那也是"全经济商品化"，而非 AI 行业专属的问题。</p>
+<p><strong>Claude Code 的诞生故事</strong></p>
+<p>Dwarkesh 问：在历史上所有竞争最激烈的应用类别之一（编程助手）中，Claude Code 成为了类别领导者，这是怎么发生的？</p>
+<p>Dario 的回答出乎意料的简单：
+1. 2025 年初，他意识到"现在是时候用 AI 模型来实质性地加速我们自己的研究了"
+2. 他鼓励内部实验，工具最初叫 Claude CLI，后来改名 Claude Code
+3. 内部快速采用，成为每个人都在用的工具
+4. Dario 看了数据说："我们的内部用户群在很多方面代表了外部用户——产品市场契合度已经验证了，应该对外发布"
+5. 发布后效果验证了判断：模型本身的快速迭代 + 内部大量使用带来的快速反馈形成了飞轮</p>
+<p>没有推出制药公司（尽管 Dario 有生物学背景），是因为制药公司需要 Anthropic 没有的资源；推出 Claude Code 是因为核心资源（模型本身 + 大量程序员 + 快速迭代文化）完全具备。</p>
+<p><strong>API 商业模式的持久性</strong></p>
+<p>Dario 预测 API 商业模式比很多人认为的更持久：因为技术在指数加速，总是有"过去三个月才成为可能的新用例"在涌现。任何固定的产品界面都会落后于模型能力，但 API 总是提供"贴近最新进展"的实验机会。1000 个实验者中，100 个成为初创公司，10 个成为成功的大公司，2-3 个成为一代产品——这个飞轮永不停转。</p>
+<p>同时，不同 token 的价值差异将导致新商业模式：帮你重启 Mac 的 token 值几美分，告诉制药公司"把这个芳香环移到分子的那端"的 token 可能值数千万美元。</p>
+<blockquote>
+<p>💬 <strong>精华片段</strong></p>
+<p>每个模型都赚钱，但公司在亏损——因为我们正在花 100 亿训练下一个模型。最终这个训练规模扩张会趋于平衡……那时底层经济学是盈利的，但它被这个提前建设和需求预测问题所遮蔽。</p>
+<p><em>"Each model makes money, but the company loses money. But at some point that reaches the biggest scale that it can reach... The underlying economics are profitable. The problem is you have this hellish demand prediction problem."</em></p>
+</blockquote>
+<hr />
+<h3>01:31:19 监管会摧毁 AGI 的红利吗？</h3>
+<p><strong>本节重点</strong>
+- 田纳西州"禁止 AI 情感支持聊天"法案是"愚蠢的"，但 10 年封禁所有州法且无联邦替代方案更愚蠢
+- Dario 支持：联邦标准主导 + 州法不得偏离，而非 10 年真空期
+- 近期优先级：透明度标准（监控自主风险和生物武器风险）
+- 发达国家的福利风险没那么大（市场力量会推动），发展中国家才是真正被落下的风险</p>
+<p><strong>详细精要</strong></p>
+<p>Dwarkesh 描述了监管的两难：一方面，田纳西州等地提出了荒谬的法案（禁止 AI 进行"开放性对话中的情感支持"）；另一方面，你谈的危险（生物武器自主性风险）已经在地平线上出现。法律"打地鼠"（Whac-A-Mole）把真正的福利打跑了，却不解决真正的危险？</p>
+<p><strong>Dario 对联邦封禁令的反对立场</strong></p>
+<p>他们投票反对的具体议案是：禁止所有州对 AI 的监管，为期 10 年，同时没有任何实际的联邦法案提案。他的反对理由：
+- 这不是"我支持州法"——那个田纳西州法案很蠢，他不支持
+- 而是"10 年真空期 + 无联邦替代方案 + 时间线是我们谈论的那种"这个组合太过极端</p>
+<p>他支持的方案：联邦政府出台标准，各州不得偏离（preemption），这是合理的。但"禁止州法而不做任何联邦替代"就不合理了。</p>
+<p><strong>监管的优先次序</strong></p>
+<p>Dario 提出了一个层级：
+1. <strong>当前</strong>：透明度标准——了解这些自主风险和生物武器风险的规模
+2. <strong>今年晚些时候</strong>（他的预计）：如果风险更确定，可以针对性立法（例如要求 AI 生物武器分类器）
+3. <strong>药物审批改革</strong>：AI 将大幅加速药物发现，审批流水线会堵塞——需要改革 FDA 流程，使其适应"大量高质量、副作用少的药物"的涌入
+4. <strong>聊天机器人法案</strong>：他个人反对，但在优先级上不是最担心的</p>
+<p><strong>发达国家 vs 发展中国家</strong></p>
+<p>在福利分配方面，Dario 区分了两类风险：
+- <strong>发达国家</strong>：市场力量会推动采用。当 AI 能治愈疾病、且效果比替代方案好得多时，监管体系很难真的阻止它（参考：即便有强大的经济利益方抵制出口限制，那些限制都难以真正落地）。他对发达国家的担忧主要是"走慢了"，不是"走不了"。
+- <strong>发展中国家</strong>：这是真正担心的地方。传统追赶增长依靠廉价劳动力 + 发达国家的资本和技术转移，但如果劳动力不再是约束，这个机制就失效了。他们正在与慈善机构、撒哈拉以南非洲/印度/拉美的医疗机构合作，确保 AI 的好处不只是在硅谷和社交关系与硅谷相连的地方兑现。</p>
+<blockquote>
+<p>💬 <strong>精华片段</strong></p>
+<p>那不是被投票的内容。被投票的内容是：我们要禁止所有州对 AI 的监管，为期 10 年，而且没有任何实际的联邦监管计划……我认为那是一件疯狂的事情。</p>
+<p><em>"That wasn't the thing that was being voted on. The thing that was being voted on is: we're going to ban all state regulation of AI for 10 years with no apparent plan to do any federal regulation of AI... I think that's a crazy thing to do."</em></p>
+</blockquote>
+<hr />
+<h3>01:47:41 为什么中美不能各自拥有"数据中心里的天才国度"？</h3>
+<p><strong>本节重点</strong>
+- 核威慑类比：两个"AI 超级大国"可能是进攻主导（offense-dominant），导致比核武器更危险的不稳定
+- 威权主义在 AI 加持下具有不同的、更严重的含义——可能变得"道德上过时"
+- AI 宪法的三个迭代回路：内部→公司间竞争→社会参与
+- Dario 的领导风格：每两周全公司大会（DVQ），Slack 频道直接沟通，追求"公司内部的无滤镜文化"</p>
+<p><strong>详细精要</strong></p>
+<p><strong>美中 AI 博弈</strong></p>
+<p>Dwarkesh 问：为什么中美不应该各自拥有"天才国度"——为什么要阻止中国获得高端芯片和数据中心？</p>
+<p>Dario 的回答分三个层面：</p>
+<p><strong>层面一：进攻主导性（offense-dominant）</strong>。在核武器时代，稳定来自于相互确保毁灭（mutual assured destruction），这是一种稳定的威慑均衡。但如果"两个 AI 超级大国"其中一个对是否能获胜有不同估计，就会出现冲突。核武器的稳定性建立在双方都清楚结果的基础上；AI 对抗的结果可能不那么清晰，这会制造不稳定性。</p>
+<p><strong>层面二：威权主义的 AI 放大效应</strong>。他的担心不是"中国人民"而是"中国政府"。一个已经在建设高科技威权国家的政府，一旦获得"天才国度"级别的 AI，会变得极难从内部推翻。历史上曾有封建主义因为工业化而变得"不可持续"，他寄希望于威权主义在 AI 时代也会变得"道德上过时"。</p>
+<p><strong>层面三：初始条件和谈判筹码</strong>。他的目标不是让民主国家"说了算"，而是在 AI 带来某些"关键时刻"（如进攻性网络主导权、生物武器能力等）时，民主国家联盟处于有利的谈判地位。最理想的结果是民主价值在后 AI 世界秩序的"设计规则"谈判中占据主导。</p>
+<p>Dario 也探讨了一种更激进的可能性：AI 能否被构建成具有"溶解威权结构"的内在属性？互联网曾被寄予厚望，但适得其反。他认为值得以更了解失败模式的知识再次尝试。</p>
+<p><strong>AI 宪法与治理</strong></p>
+<p>Dwarkesh 问：既然 Claude 被赋予了一组"宪法原则"，这些原则应该如何制定和迭代？</p>
+<p>Dario 描述了三个迭代回路：</p>
+<ol>
+<li><strong>内部回路</strong>：Anthropic 训练模型、不满意、改宪法。定期公开更新让外界可以评论。</li>
+<li><strong>公司间竞争</strong>：Anthropic 宪法、Gemini 宪法、OpenAI 宪法并排比较，外部观察者批评，软性激励促使所有公司向最优解靠拢——类似宪法的"市场竞争"。</li>
+<li><strong>社会参与</strong>：他们几年前与 Collective Intelligence Project 合作，让公众投票决定宪法内容；原则层面的宪法更难直接投票（需要一定的内部一致性），但仍可以征集广泛意见。</li>
+</ol>
+<p>他特别区分了两个关键问题：
+- <strong>规则 vs 原则</strong>：给模型一个"不告诉别人如何热线启动汽车"的列表，效果差；给它原则，让它理解为什么，行为更一致、更能泛化到边界情况
+- <strong>顺从性 vs 内在动机</strong>：Claude 更靠近顺从性（corrigible）一侧——大多数情况下执行用户指令，但有少数基于原则的"不可逾越线"（如不制作生物武器）</p>
+<p><strong>Dario 的领导风格：DVQ 与无滤镜文化</strong></p>
+<p>集末，Dwarkesh 问 Dario 如何在 2500 人规模的公司 CEO 角色下还能每隔几个月产出 50 页的思考型文章（如《科技的青春期》）。</p>
+<p>Dario 的回答揭示了 Anthropic 的独特文化：
+- <strong>DVQ（Dario Vision Quest）</strong>：每两周在全公司面前讲一个小时，覆盖模型进展、产品、行业和地缘政治。三四页文档作为提纲，非常直接，然后现场 Q&amp;A。"DVQ"这个名字不是 Dario 起的，但叫着叫着就叫开了
+- <strong>Slack 频道</strong>：他有一个频道，大量直接发言、回应问题，透明分享他在思考什么
+- <strong>公司文化的核心</strong>：在外部沟通中你需要谨慎，因为有人会恶意解读；但在你信任的公司内部，可以做到"完全无滤镜"。他认为 Anthropic 在保持"大家都相信彼此是出于正确原因在工作"这方面做得非常好，没有内部政治倾轧（区别于他隐约指向的"某些其他公司"）
+- <strong>时间分配</strong>：约三分之一到 40% 的时间用于确保 Anthropic 的文化是好的</p>
+<p>《科技的青春期》是在寒假里写的——平时几乎找不到时间。</p>
+<blockquote>
+<p>💬 <strong>精华片段</strong></p>
+<p>我想，在历史上最重要的某些关键决定，将会是某人冲进我办公室说，"Dario，你有两分钟。我们应该做 A 还是做 B？"我说，"我不知道，我得去吃午饭，做 B 吧。"然后那就变成了有史以来最有后果的决定。</p>
+<p><em>"Some very critical decision will be some decision where someone just comes into my office and is like, 'Dario, you have two minutes. Should we do thing A or thing B?' I'm like, 'I don't know. I have to eat lunch. Let's do B.' That ends up being the most consequential thing ever."</em></p>
+</blockquote>
+<hr />
+<h2>专业术语注释</h2>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Scaling Law</strong>（扩展定律）</td>
+<td>描述模型性能与计算量/数据量之间的幂律关系；pre-training 的扩展定律在 2019-2020 年被确立，RL 的扩展定律是当前讨论的前沿</td>
+</tr>
+<tr>
+<td><strong>Big Blob of Compute Hypothesis</strong>（大计算团假设）</td>
+<td>Dario 在 2017 年提出的非正式假设：决定 AI 进展的只有计算量、数据量和质量、训练时长、目标函数可扩展性等少数变量；所有"聪明"都是次要的</td>
+</tr>
+<tr>
+<td><strong>The Bitter Lesson</strong>（苦涩教训）</td>
+<td>Rich Sutton 2019 年文章，核心论点与大计算团假设相同：通用方法 + 足够算力总能战胜领域知识 + 专门设计</td>
+</tr>
+<tr>
+<td><strong>Continual Learning</strong>（持续学习）</td>
+<td>模型在部署后持续学习新信息的能力，区别于在训练完成后参数冻结的静态模型；是当前"在职学习"能力缺失的核心原因</td>
+</tr>
+<tr>
+<td><strong>RLHF（Reinforcement Learning from Human Feedback）</strong></td>
+<td>通过人类反馈进行强化学习；Claude 等模型的核心训练技术，但属于"主观奖励"类型，难以验证</td>
+</tr>
+<tr>
+<td><strong>Country of Geniuses in a Data Center</strong>（数据中心里的天才国度）</td>
+<td>Dario 用于描述 AGI 级别 AI 的比喻：相当于拥有一个由顶尖人才组成的国家，全天候工作，没有人类的生理限制</td>
+</tr>
+<tr>
+<td><strong>In-context Learning</strong>（上下文学习）</td>
+<td>模型仅凭提示词中的示例就能快速学会新任务，无需更新权重；Dario 认为这是"介于长期和短期人类学习之间"的机制</td>
+</tr>
+<tr>
+<td><strong>KV Cache（键值缓存）</strong></td>
+<td>Transformer 推理时存储历史注意力计算结果的内存结构；长上下文的主要瓶颈——1M token 的 KV 缓存会占用巨量 GPU 内存</td>
+</tr>
+<tr>
+<td><strong>Cournot Equilibrium</strong>（古诺均衡）</td>
+<td>寡头市场（少数竞争者）中的博弈均衡；Dario 用来解释为何 AI 行业不会演化为零利润的完全竞争，也不会是单一垄断</td>
+</tr>
+<tr>
+<td><strong>Corrigibility</strong>（顺从性）</td>
+<td>AI 系统接受人类纠正和指导的倾向；Dario 认为 Claude 设计上更靠近顺从性一侧，而非"拥有内在目标并自主行动"</td>
+</tr>
+<tr>
+<td><strong>OSWorld</strong></td>
+<td>评估 AI 使用计算机界面能力的基准测试；Claude 的计算机使用功能从约 15% 提升到 65-70%</td>
+</tr>
+<tr>
+<td><strong>Offense-dominant</strong>（进攻主导）</td>
+<td>战略概念：当进攻方比防守方占有明显优势时，国际秩序更不稳定；Dario 担忧 AI 超级大国之间可能出现这种状态</td>
+</tr>
+<tr>
+<td><strong>AI Constitution</strong>（AI 宪法）</td>
+<td>Anthropic 为 Claude 制定的行为原则文档；区别于"规则列表"——是原则性指导，让模型理解"为什么"而非只知道"做什么"</td>
+</tr>
+<tr>
+<td><strong>Amdahl's Law</strong>（阿姆达尔定律）</td>
+<td>描述系统加速的上限：整体加速受制于不可并行化的部分；Dario 用来类比 AI 渗透经济的"关闭回路"问题</td>
+</tr>
+<tr>
+<td><strong>AIME</strong></td>
+<td>美国邀请数学考试（American Invitational Mathematics Examination）；模型在该考试上的表现是评估数学推理能力的指标之一</td>
+</tr>
+<tr>
+<td><strong>MoE（Mixture of Experts）</strong></td>
+<td>稀疏专家模型架构；每次推理只激活部分参数，使得超大模型在推理时经济可行</td>
+</tr>
+<tr>
+<td><strong>DVQ（Dario Vision Quest）</strong></td>
+<td>Anthropic 内部用于 Dario 每两周全公司演讲的非正式名称；涵盖模型、产品、行业动态和地缘政治</td>
+</tr>
+<tr>
+<td><strong>Economic Diffusion</strong>（经济扩散）</td>
+<td>新技术从先驱者扩散到整个经济的过程；Dario 的核心主张是 AI 的扩散比任何历史技术都快，但仍有现实约束（法律/合规/改变管理等）</td>
+</tr>
+<tr>
+<td><strong>Mirror Life</strong>（镜像生命）</td>
+<td>合成生物学概念：由镜像手性分子（与自然界相反的 L/D 型）构成的生命形式，理论上对现有免疫系统完全透明，是潜在的生物安全威胁</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>延伸思考</h2>
+<ol>
+<li>
+<p><strong>"大计算团假设"的边界在哪里？</strong> Dario 认为几乎没有证据反对这个假设，但 Rich Sutton 等人认为当前路径缺少"真正的人类学习算法"。随着 RL 扩展进入非可验证领域，这个分歧将如何解决？哪一方的预测会先被证伪？</p>
+</li>
+<li>
+<p><strong>"天才国度"之后的竞争结构</strong>：Dario 预测行业将稳定在"3-4 个玩家的古诺均衡"，类似云计算。但如果 AI 模型能自行训练下一代 AI，进入壁垒会不会急剧下降？谁会是这一轮的"Azure 时刻"颠覆者？</p>
+</li>
+<li>
+<p><strong>经济扩散速度的"赌注"</strong>：Dario 说 AI 将是历史上扩散最快的技术，但他也说不能"无限快"。10 年内 5-50 万亿美元的 TAM 计算都依赖于一个关键假设：发现的好药物/好算法能及时通过监管并惠及全球。哪些机构性障碍最可能成为真正的瓶颈？</p>
+</li>
+<li>
+<p><strong>AI 宪法的合法性问题</strong>：Dario 描述的三层迭代回路（内部 → 公司竞争 → 社会参与）本质上仍是由私人公司主导的。在 AI 系统承载越来越多经济和政治权力的背景下，这种"宪法即产品"的模式是否能在民主社会获得足够的合法性？</p>
+</li>
+<li>
+<p><strong>威权政府的 AI 内生性</strong>：Dario 希望技术本身能"溶解"威权结构，类比封建主义因工业化而过时。但工业化也创造了 20 世纪最有效率的极权机器（纳粹德国、苏联）。有什么理由相信这次结果会不同？"AI 让人民更难被监控"和"AI 让政府更能监控人民"哪个效应更强？</p>
+</li>
+</ol>
+    <p class="meta">原文发表：Feb 13, 2026 &nbsp;·&nbsp; 纪要生成：2026-02-22</p>
+  </div>
+</body>
+</html>
