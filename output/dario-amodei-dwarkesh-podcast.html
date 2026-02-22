@@ -6,6 +6,7 @@
   <title>Dario Amodei：数据中心里的天才国度——从 AGI 时间线到全球治理</title>
   <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
@@ -161,12 +162,79 @@ hr {
     border-top: 1px solid #e8e8e8;
     margin: 36px 0;
 }
+
+/* TOC 目录侧边栏 */
+.toc-sidebar {
+    position: fixed;
+    top: 70px;
+    left: calc(50% + 415px);
+    width: 200px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 8px 0;
+}
+
+.toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #bbb;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-left: 10px;
+}
+
+.toc-sidebar a {
+    display: block;
+    color: #bbb;
+    text-decoration: none;
+    padding: 3px 0 3px 10px;
+    border-left: 2px solid #e8e8e8;
+    transition: color 0.15s, border-color 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toc-sidebar a:hover { color: #333; border-left-color: #999; }
+
+.toc-sidebar .toc-h3 {
+    padding-left: 22px;
+    font-size: 11px;
+}
+
+.toc-sidebar a.active {
+    color: #222;
+    border-left-color: #333;
+    font-weight: 500;
+}
+
+@media (max-width: 1240px) {
+    .toc-sidebar { display: none; }
+}
 </style>
 </head>
 <body>
   <div class="nav">
     <a href="index.html">← 返回目录</a>
   </div>
+  <nav class="toc-sidebar" aria-label="目录">
+  <div class="toc-title">目录</div>
+  <a class="toc-h2" href="#全集重点" title="全集重点">全集重点</a>
+  <a class="toc-h2" href="#嘉宾话题简介" title="嘉宾/话题简介">嘉宾/话题简介</a>
+  <a class="toc-h2" href="#分节详述" title="分节详述">分节详述</a>
+  <a class="toc-h3" href="#000000-我们究竟在扩展什么" title="00:00:00 我们究竟在扩展什么？">00:00:00 我们究竟在扩展什么？</a>
+  <a class="toc-h3" href="#001236-扩散是自我安慰吗agi-时间线与经济扩散的速度" title="00:12:36 扩散是"自我安慰"吗？AGI 时间线与经济扩散的速度">00:12:36 扩散是"自我安慰"吗？AGI 时间线与经济扩散的速度</a>
+  <a class="toc-h3" href="#002942-持续学习真的必要吗如何解决" title="00:29:42 持续学习真的必要吗？如何解决？">00:29:42 持续学习真的必要吗？如何解决？</a>
+  <a class="toc-h3" href="#004620-如果-agi-近在眼前为什么不买更多算力" title="00:46:20 如果 AGI 近在眼前，为什么不买更多算力？">00:46:20 如果 AGI 近在眼前，为什么不买更多算力？</a>
+  <a class="toc-h3" href="#005849-ai-实验室如何真正盈利" title="00:58:49 AI 实验室如何真正盈利？">00:58:49 AI 实验室如何真正盈利？</a>
+  <a class="toc-h3" href="#013119-监管会摧毁-agi-的红利吗" title="01:31:19 监管会摧毁 AGI 的红利吗？">01:31:19 监管会摧毁 AGI 的红利吗？</a>
+  <a class="toc-h3" href="#014741-为什么中美不能各自拥有数据中心里的天才国度" title="01:47:41 为什么中美不能各自拥有"数据中心里的天才国度"？">01:47:41 为什么中美不能各自拥有"数据中心里的天才国度"？</a>
+  <a class="toc-h2" href="#专业术语注释" title="专业术语注释">专业术语注释</a>
+  <a class="toc-h2" href="#延伸思考" title="延伸思考">延伸思考</a>
+</nav>
   <div class="container">
     <p><a href="https://www.dwarkesh.com/p/dario-amodei-2">▶ 原文链接</a></p>
 <h1>Dario Amodei：数据中心里的天才国度——从 AGI 时间线到全球治理</h1>
@@ -174,7 +242,7 @@ hr {
 <strong>原文发表：</strong> Feb 13, 2026
 <strong>纪要生成：</strong> 2026-02-22</p>
 <hr />
-<div class="highlights"><h2>全集重点</h2>
+<div class="highlights"><h2 id="全集重点">全集重点</h2>
 <ul>
 <li><strong>"大计算团假设"十年不变</strong>：Dario 在 2017 年提出的核心假设至今成立——规模、数据、目标函数才是决定因素，所有"需要新方法"的聪明都不那么重要；RL 扩展与预训练扩展遵循同样的规律</li>
 <li><strong>"数据中心里的天才国度"：90% 确定、1-3 年内</strong>：Dario 预测 10 年内 AGI 达到 90% 概率，其中 1-3 年达到"天才国度"级别是他的直觉（约 50/50）；已验证任务（代码、数学）更确定，不可验证任务有少量残余不确定性</li>
@@ -183,11 +251,11 @@ hr {
 <li><strong>AGI 治理：联邦标准优于州法拼盘，民主国家需先于威权掌握"关键时刻"</strong>：Dario 支持联邦层面主导监管（而非 10 年封禁州法），忧虑威权政府在 AI 加持下变得更难推翻；AI 宪法应通过竞争性迭代而非独家制定</li>
 </ul>
 <hr />
-</div><h2>嘉宾/话题简介</h2>
+</div><h2 id="嘉宾话题简介">嘉宾/话题简介</h2>
 <p>Dario Amodei 是 Anthropic 的 CEO 和联合创始人，此前曾任 OpenAI 研究副总裁。他是 Anthropic Claude 系列模型的核心设计者，也是近期"《科技的青春期》"（The Adolescence of Technology）等长文的作者。本集是他与 Dwarkesh Patel 时隔三年的第二次深度对话，覆盖了 AI 扩展假设的当前状态、AGI 时间线、经济扩散的速度、AI 实验室的商业模式、监管挑战、美中芯片竞争，以及 Anthropic 内部的文化管理——是一场罕见的将技术判断、经济学推理和地缘政治视角完整融合的对话。</p>
 <hr />
-<h2>分节详述</h2>
-<h3>00:00:00 我们究竟在扩展什么？</h3>
+<h2 id="分节详述">分节详述</h2>
+<h3 id="000000-我们究竟在扩展什么">00:00:00 我们究竟在扩展什么？</h3>
 <p><strong>本节重点</strong>
 - Dario 的"大计算团假设"（Big Blob of Compute Hypothesis）从 2017 年至今未变，列出七个真正重要的变量
 - RL 扩展与预训练扩展遵循完全相同的规律（对数线性，log-linear）
@@ -223,7 +291,7 @@ hr {
 <p><em>"The hypothesis is basically the same. What it says is that all the cleverness, all the techniques, all the 'we need a new method to do something', that doesn't matter very much. There are only a few things that matter."</em></p>
 </blockquote>
 <hr />
-<h3>00:12:36 扩散是"自我安慰"吗？AGI 时间线与经济扩散的速度</h3>
+<h3 id="001236-扩散是自我安慰吗agi-时间线与经济扩散的速度">00:12:36 扩散是"自我安慰"吗？AGI 时间线与经济扩散的速度</h3>
 <p><strong>本节重点</strong>
 - "天才国度"10 年内：90% 概率；1-3 年内：约 50% 直觉判断
 - 不可验证任务（写小说、规划火星任务）有少量残余不确定性，已验证任务（代码）接近确定
@@ -260,7 +328,7 @@ hr {
 <p><em>"I think we should be thinking about this middle world where things are extremely fast, but not instant, where they take time because of economic diffusion, because of the need to close the loop... Fast adoption, but not infinitely fast."</em></p>
 </blockquote>
 <hr />
-<h3>00:29:42 持续学习真的必要吗？如何解决？</h3>
+<h3 id="002942-持续学习真的必要吗如何解决">00:29:42 持续学习真的必要吗？如何解决？</h3>
 <p><strong>本节重点</strong>
 - 视频编辑的"在职学习"类比：AI 何时能做到随用随会？Dario 预测 1-3 年
 - 编程领域的生产力争议：Anthropic 内部数据明确，但外部研究显示混合结果
@@ -290,7 +358,7 @@ hr {
 <p><em>"There's actually a stronger history of some of these things seeming like a big deal and then kind of dissolving... I would ground us in something like code. I think we may get to the point in a year or two where the models can just do SWE end-to-end."</em></p>
 </blockquote>
 <hr />
-<h3>00:46:20 如果 AGI 近在眼前，为什么不买更多算力？</h3>
+<h3 id="004620-如果-agi-近在眼前为什么不买更多算力">00:46:20 如果 AGI 近在眼前，为什么不买更多算力？</h3>
 <p><strong>本节重点</strong>
 - 技术曲线的不确定性 vs. 经济扩散的不确定性：两者叠加使得"买多少算力"极难决策
 - 差一年就能破产：如果预期收入是 1 万亿美元而实际是 8000 亿，就倒闭了
@@ -317,7 +385,7 @@ hr {
 <p><strong>机器人：天才国度之后约一两年</strong></p>
 <p>Dwarkesh 问机器人何时被 AI 革命。Dario 认为机器人的进步不依赖于"像人类一样的在职学习"——可以通过 RL 在大量游戏/模拟环境中泛化，或通过上下文学习来实现。无论哪种路径，当模型具备了这些技能，机器人将同时在两个维度被革新：设计更好（AI 比人类更擅长机器人设计），控制更好（AI 控制机器人）。时间上，"天才国度"之后再加一两年"同样的扩散滞后"。</p>
 <hr />
-<h3>00:58:49 AI 实验室如何真正盈利？</h3>
+<h3 id="005849-ai-实验室如何真正盈利">00:58:49 AI 实验室如何真正盈利？</h3>
 <p><strong>本节重点</strong>
 - 每个单独模型本身是盈利的（70%+ 毛利率），公司整体亏损是因为指数扩张预付算力
 - 行业均衡：少数玩家的古诺均衡（Cournot equilibrium），利润非零非天文数字，类似云计算行业
@@ -358,7 +426,7 @@ hr {
 <p><em>"Each model makes money, but the company loses money. But at some point that reaches the biggest scale that it can reach... The underlying economics are profitable. The problem is you have this hellish demand prediction problem."</em></p>
 </blockquote>
 <hr />
-<h3>01:31:19 监管会摧毁 AGI 的红利吗？</h3>
+<h3 id="013119-监管会摧毁-agi-的红利吗">01:31:19 监管会摧毁 AGI 的红利吗？</h3>
 <p><strong>本节重点</strong>
 - 田纳西州"禁止 AI 情感支持聊天"法案是"愚蠢的"，但 10 年封禁所有州法且无联邦替代方案更愚蠢
 - Dario 支持：联邦标准主导 + 州法不得偏离，而非 10 年真空期
@@ -387,7 +455,7 @@ hr {
 <p><em>"That wasn't the thing that was being voted on. The thing that was being voted on is: we're going to ban all state regulation of AI for 10 years with no apparent plan to do any federal regulation of AI... I think that's a crazy thing to do."</em></p>
 </blockquote>
 <hr />
-<h3>01:47:41 为什么中美不能各自拥有"数据中心里的天才国度"？</h3>
+<h3 id="014741-为什么中美不能各自拥有数据中心里的天才国度">01:47:41 为什么中美不能各自拥有"数据中心里的天才国度"？</h3>
 <p><strong>本节重点</strong>
 - 核威慑类比：两个"AI 超级大国"可能是进攻主导（offense-dominant），导致比核武器更危险的不稳定
 - 威权主义在 AI 加持下具有不同的、更严重的含义——可能变得"道德上过时"
@@ -426,7 +494,7 @@ hr {
 <p><em>"Some very critical decision will be some decision where someone just comes into my office and is like, 'Dario, you have two minutes. Should we do thing A or thing B?' I'm like, 'I don't know. I have to eat lunch. Let's do B.' That ends up being the most consequential thing ever."</em></p>
 </blockquote>
 <hr />
-<h2>专业术语注释</h2>
+<h2 id="专业术语注释">专业术语注释</h2>
 <table>
 <thead>
 <tr>
@@ -514,7 +582,7 @@ hr {
 </tbody>
 </table>
 <hr />
-<h2>延伸思考</h2>
+<h2 id="延伸思考">延伸思考</h2>
 <ol>
 <li>
 <p><strong>"大计算团假设"的边界在哪里？</strong> Dario 认为几乎没有证据反对这个假设，但 Rich Sutton 等人认为当前路径缺少"真正的人类学习算法"。随着 RL 扩展进入非可验证领域，这个分歧将如何解决？哪一方的预测会先被证伪？</p>
@@ -534,5 +602,23 @@ hr {
 </ol>
     <p class="meta">原文发表：Feb 13, 2026 &nbsp;·&nbsp; 纪要生成：2026-02-22</p>
   </div>
+  <script>
+(function () {
+  var links = document.querySelectorAll('.toc-sidebar a');
+  var headings = Array.from(document.querySelectorAll('h2[id], h3[id]'));
+  if (!headings.length || !links.length) return;
+  function setActive() {
+    var active = headings[0];
+    for (var i = 0; i < headings.length; i++) {
+      if (headings[i].getBoundingClientRect().top <= 90) active = headings[i];
+    }
+    links.forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
+    });
+  }
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+}());
+</script>
 </body>
 </html>

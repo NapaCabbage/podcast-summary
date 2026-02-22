@@ -6,6 +6,7 @@
   <title>Claude Code 是如何工作的——Jared Zoneraich，PromptLayer</title>
   <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
@@ -161,12 +162,90 @@ hr {
     border-top: 1px solid #e8e8e8;
     margin: 36px 0;
 }
+
+/* TOC 目录侧边栏 */
+.toc-sidebar {
+    position: fixed;
+    top: 70px;
+    left: calc(50% + 415px);
+    width: 200px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 8px 0;
+}
+
+.toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #bbb;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-left: 10px;
+}
+
+.toc-sidebar a {
+    display: block;
+    color: #bbb;
+    text-decoration: none;
+    padding: 3px 0 3px 10px;
+    border-left: 2px solid #e8e8e8;
+    transition: color 0.15s, border-color 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toc-sidebar a:hover { color: #333; border-left-color: #999; }
+
+.toc-sidebar .toc-h3 {
+    padding-left: 22px;
+    font-size: 11px;
+}
+
+.toc-sidebar a.active {
+    color: #222;
+    border-left-color: #333;
+    font-weight: 500;
+}
+
+@media (max-width: 1240px) {
+    .toc-sidebar { display: none; }
+}
 </style>
 </head>
 <body>
   <div class="nav">
     <a href="index.html">← 返回目录</a>
   </div>
+  <nav class="toc-sidebar" aria-label="目录">
+  <div class="toc-title">目录</div>
+  <a class="toc-h2" href="#全集重点" title="全集重点">全集重点</a>
+  <a class="toc-h2" href="#嘉宾与背景" title="嘉宾与背景">嘉宾与背景</a>
+  <a class="toc-h2" href="#分节详述" title="分节详述">分节详述</a>
+  <a class="toc-h3" href="#0000-演讲者介绍与-claude-code-概览" title="00:00 演讲者介绍与 Claude Code 概览">00:00 演讲者介绍与 Claude Code 概览</a>
+  <a class="toc-h3" href="#0435-编程-agent-的演化与突破" title="04:35 编程 Agent 的演化与突破">04:35 编程 Agent 的演化与突破</a>
+  <a class="toc-h3" href="#0754-核心哲学简单架构与更好的模型" title="07:54 核心哲学：简单架构与更好的模型">07:54 核心哲学：简单架构与更好的模型</a>
+  <a class="toc-h3" href="#1211-claude-code-核心工具详解" title="12:11 Claude Code 核心工具详解">12:11 Claude Code 核心工具详解</a>
+  <a class="toc-h3" href="#1552-bash-的力量与-to-do-列表实现" title="15:52 Bash 的力量与 To-Do 列表实现">15:52 Bash 的力量与 To-Do 列表实现</a>
+  <a class="toc-h3" href="#1925-to-do-列表结构与告别复杂-dag" title="19:25 To-Do 列表结构与告别复杂 DAG">19:25 To-Do 列表结构与告别复杂 DAG</a>
+  <a class="toc-h3" href="#2324-信任模型与沙箱安全机制" title="23:24 信任模型与沙箱安全机制">23:24 信任模型与沙箱安全机制</a>
+  <a class="toc-h3" href="#2723-子-agent-与系统提示内容" title="27:23 子 Agent 与系统提示内容">27:23 子 Agent 与系统提示内容</a>
+  <a class="toc-h3" href="#3155-系统提示与-skills-的使用" title="31:55 系统提示与 Skills 的使用">31:55 系统提示与 Skills 的使用</a>
+  <a class="toc-h3" href="#3605-skills-的挑战与未来创新方向" title="36:05 Skills 的挑战与未来创新方向">36:05 Skills 的挑战与未来创新方向</a>
+  <a class="toc-h3" href="#3921-另类架构ai-治疗师问题" title="39:21 另类架构："AI 治疗师问题"">39:21 另类架构："AI 治疗师问题"</a>
+  <a class="toc-h3" href="#4214-各-agent-横向对比codex-vs-amp" title="42:14 各 Agent 横向对比：Codex vs. AMP">42:14 各 Agent 横向对比：Codex vs. AMP</a>
+  <a class="toc-h3" href="#4503-cursor-agent-与-amp-的上下文管理" title="45:03 Cursor Agent 与 AMP 的上下文管理">45:03 Cursor Agent 与 AMP 的上下文管理</a>
+  <a class="toc-h3" href="#4842-评估编程-agent-与严格工具测试" title="48:42 评估编程 Agent 与严格工具测试">48:42 评估编程 Agent 与严格工具测试</a>
+  <a class="toc-h3" href="#5201-工具测试实践与-headless-sdk-的未来" title="52:01 工具测试实践与 Headless SDK 的未来">52:01 工具测试实践与 Headless SDK 的未来</a>
+  <a class="toc-h3" href="#5511-总结要点与用-claude-code-制作-ppt" title="55:11 总结要点与用 Claude Code 制作 PPT">55:11 总结要点与用 Claude Code 制作 PPT</a>
+  <a class="toc-h3" href="#5725-关于-dag-与顺序执行的问答" title="57:25 关于 DAG 与顺序执行的问答">57:25 关于 DAG 与顺序执行的问答</a>
+  <a class="toc-h3" href="#010015-llm-调用的未来与规格驱动开发" title="01:00:15 LLM 调用的未来与规格驱动开发">01:00:15 LLM 调用的未来与规格驱动开发</a>
+  <a class="toc-h2" href="#专业术语注释" title="专业术语注释">专业术语注释</a>
+  <a class="toc-h2" href="#延伸思考" title="延伸思考">延伸思考</a>
+</nav>
   <div class="container">
     <p><a href="https://www.youtube.com/watch?v=RFKCzGlAU6Q">▶ 原文链接</a></p>
 <h1>Claude Code 是如何工作的——Jared Zoneraich，PromptLayer</h1>
@@ -174,7 +253,7 @@ hr {
 <strong>原文发表：</strong> Dec 26, 2025
 <strong>纪要生成：</strong> 2026-02-22</p>
 <hr />
-<div class="highlights"><h2>全集重点</h2>
+<div class="highlights"><h2 id="全集重点">全集重点</h2>
 <ul>
 <li><strong>简单 while 循环就是全部架构</strong>：Claude Code 的核心只有四行逻辑——有 Tool Call 就执行、把结果还给模型、循环直到没有 Tool Call 为止，所有顶级编程 Agent 都在用这套</li>
 <li><strong>Bash 是最重要的工具</strong>：几乎所有任务都可以只用 Bash 完成，训练数据最丰富、最通用，是编程 Agent 的"万能适配器"，比专用工具更可靠</li>
@@ -183,11 +262,11 @@ hr {
 <li><strong>没有全局最优解</strong>：Claude Code、Codex、Cursor、AMP 各有哲学和优势，就像治疗师没有绝对最优，不同场景选不同工具，品味（Taste）和架构判断力比技术细节更重要</li>
 </ul>
 <hr />
-</div><h2>嘉宾与背景</h2>
+</div><h2 id="嘉宾与背景">嘉宾与背景</h2>
 <p>Jared Zoneraich 是 PromptLayer 的创始人，这是一个面向 AI 工程师团队的提示词管理、日志记录与测试平台，总部位于纽约，已运行三年，每天处理数百万次 LLM 请求。本次演讲是一个约 800 人参加的 NYC AI Engineering Workshop 的最后一场，也是全场压轴。内容完全基于 Jared 深度使用各类编程 Agent 的第一手经验，以及与 PromptLayer 客户大量对话所积累的洞察，<strong>非 Anthropic 官方内容</strong>，Jared 本人也多次强调这一点（甚至笑称因为演讲标题被 Anthropic"批评"过）。</p>
 <hr />
-<h2>分节详述</h2>
-<h3>00:00 演讲者介绍与 Claude Code 概览</h3>
+<h2 id="分节详述">分节详述</h2>
+<h3 id="0000-演讲者介绍与-claude-code-概览">00:00 演讲者介绍与 Claude Code 概览</h3>
 <p><strong>本节重点</strong>
 - Jared 的团队已将整个工程组织围绕 Claude Code 重构，制定了"一小时内能用 Claude Code 搞定的直接做，不排优先级"的规则
 - 演讲目标：理解编程 Agent 为何突然变好、内部机制是什么、如何应用于自己的 AI 工程实践
@@ -201,7 +280,7 @@ hr {
 <p><em>"We made a rule for our engineering organization: if you can complete something in less than an hour using Claude Code, just do it. Don't prioritize it. And we're a small team on purpose but it's helped us a lot and I think it's really taken us to the next level."</em></p>
 </blockquote>
 <hr />
-<h3>04:35 编程 Agent 的演化与突破</h3>
+<h3 id="0435-编程-agent-的演化与突破">04:35 编程 Agent 的演化与突破</h3>
 <p><strong>本节重点</strong>
 - 编程 Agent 经历了四个清晰的演化阶段，每一步都有质变
 - Claude Code 代表了当前最新形态：彻底的"无界面"工作流，Agent 自主完成所有操作
@@ -222,7 +301,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"I think a lot of the breakthrough is kind of boring in that it's just Anthropic releasing a better model that works better for these type of tooling calls and these type of things."</em></p>
 </blockquote>
 <hr />
-<h3>07:54 核心哲学：简单架构与更好的模型</h3>
+<h3 id="0754-核心哲学简单架构与更好的模型">07:54 核心哲学：简单架构与更好的模型</h3>
 <p><strong>本节重点</strong>
 - 核心哲学一句话：<strong>给它工具，然后让它自己干</strong>（Give it tools and get out of the way）
 - Tool Call 取代了过去所有复杂的 JSON 格式化、分类、路由机制
@@ -244,7 +323,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"Give it tools and then get out of the way is what a one-liner of the architecture is today."</em></p>
 </blockquote>
 <hr />
-<h3>12:11 Claude Code 核心工具详解</h3>
+<h3 id="1211-claude-code-核心工具详解">12:11 Claude Code 核心工具详解</h3>
 <p><strong>本节重点</strong>
 - 所有工具的设计原则：<strong>模拟人类在终端操作的方式</strong>，不是发明新范式
 - Edit 使用 Diff（差异）而非重写整个文件，是节省 Token 和减少错误的关键
@@ -268,7 +347,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p>上下文管理的核心答案。每个 Task 有自己完全独立的 Context Window，只把结果返回主循环，不污染主上下文。后面专门讲。</p>
 <p>Jared 最后提醒：这个工具列表每天都在变化，Anthropic 几乎每隔几天就有新版本发布。今天可能是这几个工具，明天可能多 15 个，后天可能缩减到 5 个，这是一个快速迭代的领域。</p>
 <hr />
-<h3>15:52 Bash 的力量与 To-Do 列表实现</h3>
+<h3 id="1552-bash-的力量与-to-do-列表实现">15:52 Bash 的力量与 To-Do 列表实现</h3>
 <p><strong>本节重点</strong>
 - Bash 是所有工具中最重要的：简单、万能、训练数据最丰富
 - Claude Code 创建 Python 临时脚本、运行、删除——这是整个系统能力的象征
@@ -290,7 +369,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"Bash is all you need. I think you could probably get rid of all these tools and only have Bash."</em></p>
 </blockquote>
 <hr />
-<h3>19:25 To-Do 列表结构与告别复杂 DAG</h3>
+<h3 id="1925-to-do-列表结构与告别复杂-dag">19:25 To-Do 列表结构与告别复杂 DAG</h3>
 <p><strong>本节重点</strong>
 - Todo 数据结构包含：版本号、哈希 ID、人类可读标题、可注入的任意证据数据
 - Todo 带来四个核心好处：强制规划、崩溃恢复、UX 可见性、用户可引导
@@ -335,7 +414,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"It's 10x easier to develop these things, 10x more maintainable, and it actually works way better because our models are just good now."</em></p>
 </blockquote>
 <hr />
-<h3>23:24 信任模型与沙箱安全机制</h3>
+<h3 id="2324-信任模型与沙箱安全机制">23:24 信任模型与沙箱安全机制</h3>
 <p><strong>本节重点</strong>
 - 核心原则：遇到不确定时，依靠模型探索，不要手动预设每个步骤
 - 过多的手工引导反而会让 Agent 变差（加了按钮标题导致导航变差的实验）
@@ -365,7 +444,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"Don't try to think through every edge case and think through every if statement. Just rely on the model to explore and figure it out."</em></p>
 </blockquote>
 <hr />
-<h3>27:23 子 Agent 与系统提示内容</h3>
+<h3 id="2723-子-agent-与系统提示内容">27:23 子 Agent 与系统提示内容</h3>
 <p><strong>本节重点</strong>
 - 子 Agent（Sub-Agent）是解决 Context 污染问题的核心方案：独立上下文，只返回结果
 - Task 工具 API：接受 Description 和 Prompt 两个参数，主 Agent 动态生成子 Agent 的 Prompt
@@ -401,7 +480,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"The prompt you're going to give as a long string—which is really interesting because now we have the coding agent prompting its own agents."</em></p>
 </blockquote>
 <hr />
-<h3>31:55 系统提示与 Skills 的使用</h3>
+<h3 id="3155-系统提示与-skills-的使用">31:55 系统提示与 Skills 的使用</h3>
 <p><strong>本节重点</strong>
 - CLAUDE.md 是项目的"宪法"，比 Cursor 的向量数据库方案简单得多但够用
 - Skills 是"按需加载的扩展系统提示"，解决 CLAUDE.md 超过 40K 字符的问题
@@ -427,7 +506,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"Everything's prompt engineering at the end of the day, or context engineering. Everything is: how do you adapt these general purpose models for your usage?"</em></p>
 </blockquote>
 <hr />
-<h3>36:05 Skills 的挑战与未来创新方向</h3>
+<h3 id="3605-skills-的挑战与未来创新方向">36:05 Skills 的挑战与未来创新方向</h3>
 <p><strong>本节重点</strong>
 - Skills 的现实问题：Agent 经常不会主动调用，实际上需要用户手动触发
 - 这可能是模型训练问题，也可能是 Prompt 问题，Skills 作为功能还不够成熟
@@ -449,7 +528,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><strong>新的"一等公民"范式</strong></p>
 <p>Jared 认为 To-Do 和 Skills 都是"一等公民"范式的例子——把某个重要但通常隐式存在的概念，显式地建模到系统中，赋予它结构和接口。还有哪些概念值得这样处理？他认为答案尚未出现，但这是一个值得探索的方向。</p>
 <hr />
-<h3>39:21 另类架构："AI 治疗师问题"</h3>
+<h3 id="3921-另类架构ai-治疗师问题">39:21 另类架构："AI 治疗师问题"</h3>
 <p><strong>本节重点</strong>
 - "AI 治疗师问题"：某类 AI 产品问题没有全局最优解，只有针对不同情境的最优解
 - 五个有代表性的编程 Agent 各有独特哲学，没有绝对赢家
@@ -467,7 +546,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"I don't think there's going to be one winner to this. I think there's going to be different winners for different use cases."</em></p>
 </blockquote>
 <hr />
-<h3>42:14 各 Agent 横向对比：Codex vs. AMP</h3>
+<h3 id="4214-各-agent-横向对比codex-vs-amp">42:14 各 Agent 横向对比：Codex vs. AMP</h3>
 <p><strong>本节重点</strong>
 - OpenAI Codex：开源、Rust 编写、更偏事件驱动、内核级沙箱（kernel-based）
 - Sourcegraph AMP：免费、无模型选择器、核心目标是构建"Agent 友好的开发环境"
@@ -489,7 +568,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><strong>核心愿景——Agent 友好的开发环境</strong>：AMP 的目标不只是"最好的 Agent"，而是"与 Agent 配合最好的开发环境"。具体来说：如何构建一个密封的（Hermetically Sealed）代码库，让 Agent 可以跑测试？如何建立完整的反馈循环（Feedback Loop），让 Agent 能基于测试结果自我修正？如何让 Agent 看自己的设计输出并迭代改进？这是"自主 Agent 的圣杯"。Jared 说他很期待看到前端版本的这类系统。</p>
 <p><strong>Handoff 机制</strong>：当 Context 快满时，AMP 不是等待 Compact（压缩摘要，通常需要等待较长时间），而是直接开一个新的对话线程，把当前任务的必要信息打包传递过去，继续执行。Jared 用 Call of Duty 的类比：换弹匣（Handoff）比等待重新装弹（Compact）快得多。他认为这可能是更好的策略，虽然两种策略可能都有价值。</p>
 <hr />
-<h3>45:03 Cursor Agent 与 AMP 的上下文管理</h3>
+<h3 id="4503-cursor-agent-与-amp-的上下文管理">45:03 Cursor Agent 与 AMP 的上下文管理</h3>
 <p><strong>本节重点</strong>
 - AMP 的三档模型：Fast / Smart / Oracle，Oracle 刻意不透露具体是哪个模型
 - Cursor Composer 靠蒸馏（Distillation）构建快速专用模型，重新点燃了业界对微调的兴趣
@@ -503,7 +582,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><strong>Cursor 的迭代故事</strong></p>
 <p>Jared 特别提到 Cursor 的成功是一个关于<strong>产品迭代</strong>的故事：Cursor 1.0 真的很烂，但因为只是 VS Code 的分支，进入门槛极低——"没什么可失去的，试试看"。这个低摩擦的入口让 Cursor 积累了大量用户，获得了大量数据，然后用这些数据不断改进。现在 Cursor 是市场上最受欢迎的编程工具之一。<strong>低门槛试用 + 持续迭代 + 数据飞轮</strong>，这个组合被证明非常有效。</p>
 <hr />
-<h3>48:42 评估编程 Agent 与严格工具测试</h3>
+<h3 id="4842-评估编程-agent-与严格工具测试">48:42 评估编程 Agent 与严格工具测试</h3>
 <p><strong>本节重点</strong>
 - Benchmark 已经沦为营销工具，"所有模型都在打败 Benchmark"不可信
 - 三种评测框架：端到端测试、时间点快照测试、回测（Backtest，最推荐）
@@ -531,7 +610,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"Benchmarks have become marketing for a lot of these model providers. Every model beats the benchmarks. I don't know how that happens."</em></p>
 </blockquote>
 <hr />
-<h3>52:01 工具测试实践与 Headless SDK 的未来</h3>
+<h3 id="5201-工具测试实践与-headless-sdk-的未来">52:01 工具测试实践与 Headless SDK 的未来</h3>
 <p><strong>本节重点</strong>
 - 具体的 LLM Judge 测试流程：运行 → 检查 → 若不符合则自动修正 → 循环
 - Headless Claude Code SDK 让 Agent 成为 CI/CD 流水线的一部分
@@ -561,7 +640,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><em>"You just give a simple prompt and it's just another part of your pipeline."</em></p>
 </blockquote>
 <hr />
-<h3>55:11 总结要点与用 Claude Code 制作 PPT</h3>
+<h3 id="5511-总结要点与用-claude-code-制作-ppt">55:11 总结要点与用 Claude Code 制作 PPT</h3>
 <p><strong>本节重点</strong>
 - 五条核心 Takeaway：信任模型、简单设计、Bash 就够、管理 Context、尊重不同视角
 - 这整个 PPT 本身就是用 Claude Code + Skills 构建的，是方法论的现场证明
@@ -580,7 +659,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 - <strong>Design Skill</strong>：告诉 Claude Code 他的设计偏好，让它给视觉元素（比如盒子）添加合适的颜色和样式</p>
 <p>整个 PPT 的制作过程就是对"给它工具、信任模型、用 Skills 按需加载上下文"这套方法论的现场演示。</p>
 <hr />
-<h3>57:25 关于 DAG 与顺序执行的问答</h3>
+<h3 id="5725-关于-dag-与顺序执行的问答">57:25 关于 DAG 与顺序执行的问答</h3>
 <p><strong>本节重点</strong>
 - DAG 有价值的场景：固定步骤、固定输出格式的任务
 - 没有 DAG 也能保证顺序的方法：系统提示里指定顺序要求 + Tool Call 封装关键步骤
@@ -596,7 +675,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 - 在系统提示里加一条"始终以生成输出文件作为结束"的指令</p>
 <p>这样既保留了探索阶段的灵活性，又保证了输出格式的一致性。</p>
 <hr />
-<h3>01:00:15 LLM 调用的未来与规格驱动开发</h3>
+<h3 id="010015-llm-调用的未来与规格驱动开发">01:00:15 LLM 调用的未来与规格驱动开发</h3>
 <p><strong>本节重点</strong>
 - 未来可能直接调用 Headless Claude Code 而非 LLM API：推理模型本质上就是个 while 循环
 - 规格驱动开发（Spec-Driven Development）和测试驱动开发（TDD）对 Agent 编程依然有价值
@@ -614,7 +693,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 <p><strong>系统提示存储位置的揭秘</strong></p>
 <p>演讲快结束时，有观众问：Claude Code 的系统提示是存在 Anthropic 的服务器上还是本地机器？现场有人（Nico）知道答案：<strong>存在本地机器上</strong>。Jared 说这意味着他之前研究的那份泄露版本可能确实是从某人的本地文件里找到的，并不需要破解服务器。</p>
 <hr />
-<h2>专业术语注释</h2>
+<h2 id="专业术语注释">专业术语注释</h2>
 <table>
 <thead>
 <tr>
@@ -710,7 +789,7 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 </tbody>
 </table>
 <hr />
-<h2>延伸思考</h2>
+<h2 id="延伸思考">延伸思考</h2>
 <ol>
 <li><strong>技术债的时间窗口困境</strong>：今天为模型局限写的补丁代码，三到六个月后模型变强就变成废代码——如何在"解决眼前真实问题"和"避免过度工程化"之间找到动态平衡点，是每个 AI 工程师的日常挑战，也是这个时代特有的工程管理问题</li>
 <li><strong>评测体系的缺失是最大风险</strong>：Benchmark 失效、端到端测试难以覆盖、Agent Smell 只是启发式检查——真正系统化的 Agent 评测方法论尚未成熟，这意味着很多团队在"感觉上"而非"数据上"判断 Agent 的质量</li>
@@ -720,5 +799,23 @@ Claude Code 代表的是完全不同的范式：<strong>不触碰代码，也不
 </ol>
     <p class="meta">原文发表：Dec 26, 2025 &nbsp;·&nbsp; 纪要生成：2026-02-22</p>
   </div>
+  <script>
+(function () {
+  var links = document.querySelectorAll('.toc-sidebar a');
+  var headings = Array.from(document.querySelectorAll('h2[id], h3[id]'));
+  if (!headings.length || !links.length) return;
+  function setActive() {
+    var active = headings[0];
+    for (var i = 0; i < headings.length; i++) {
+      if (headings[i].getBoundingClientRect().top <= 90) active = headings[i];
+    }
+    links.forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
+    });
+  }
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+}());
+</script>
 </body>
 </html>

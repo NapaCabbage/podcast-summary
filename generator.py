@@ -13,6 +13,7 @@ OUTPUT_DIR = 'output'
 # 网页通用 CSS 样式
 CSS = """
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
@@ -168,6 +169,58 @@ hr {
     border-top: 1px solid #e8e8e8;
     margin: 36px 0;
 }
+
+/* TOC 目录侧边栏 */
+.toc-sidebar {
+    position: fixed;
+    top: 70px;
+    left: calc(50% + 415px);
+    width: 200px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 8px 0;
+}
+
+.toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #bbb;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-left: 10px;
+}
+
+.toc-sidebar a {
+    display: block;
+    color: #bbb;
+    text-decoration: none;
+    padding: 3px 0 3px 10px;
+    border-left: 2px solid #e8e8e8;
+    transition: color 0.15s, border-color 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toc-sidebar a:hover { color: #333; border-left-color: #999; }
+
+.toc-sidebar .toc-h3 {
+    padding-left: 22px;
+    font-size: 11px;
+}
+
+.toc-sidebar a.active {
+    color: #222;
+    border-left-color: #333;
+    font-weight: 500;
+}
+
+@media (max-width: 1240px) {
+    .toc-sidebar { display: none; }
+}
 """
 
 
@@ -209,6 +262,80 @@ def md_to_html(content):
     return html
 
 
+TOC_JS = """<script>
+(function () {
+  var links = document.querySelectorAll('.toc-sidebar a');
+  var headings = Array.from(document.querySelectorAll('h2[id], h3[id]'));
+  if (!headings.length || !links.length) return;
+  function setActive() {
+    var active = headings[0];
+    for (var i = 0; i < headings.length; i++) {
+      if (headings[i].getBoundingClientRect().top <= 90) active = headings[i];
+    }
+    links.forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
+    });
+  }
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+}());
+</script>"""
+
+
+def slugify_id(text):
+    """将标题文本转为有效的 HTML id 属性值"""
+    text = re.sub(r'[^\w\s-]', '', text, flags=re.UNICODE)
+    text = text.strip().lower()
+    text = re.sub(r'[\s_]+', '-', text)
+    text = re.sub(r'-+', '-', text).strip('-')
+    return text or 'section'
+
+
+def build_toc_and_add_ids(html):
+    """
+    在 HTML 的 h2/h3 标签上添加 id 属性，返回 (modified_html, toc_items)。
+    toc_items: list of (level, text, id_str)
+    """
+    toc_items = []
+    id_counter = {}
+
+    def replace_heading(match):
+        tag = match.group(1)
+        attrs = match.group(2)
+        inner = match.group(3)
+        text = re.sub(r'<[^>]+>', '', inner).strip()
+        base_id = slugify_id(text)
+        count = id_counter.get(base_id, 0)
+        id_counter[base_id] = count + 1
+        uid = base_id if count == 0 else f'{base_id}-{count}'
+        toc_items.append((int(tag[1]), text, uid))
+        extra = (' ' + attrs.strip()) if attrs.strip() else ''
+        return f'<{tag} id="{uid}"{extra}>{inner}</{tag}>'
+
+    modified = re.sub(
+        r'<(h[23])([^>]*)>(.*?)</\1>',
+        replace_heading,
+        html,
+        flags=re.DOTALL
+    )
+    return modified, toc_items
+
+
+def build_toc_html(toc_items):
+    """从 toc_items 生成 TOC 侧边栏 HTML"""
+    if not toc_items:
+        return ''
+    lines = [
+        '<nav class="toc-sidebar" aria-label="目录">',
+        '  <div class="toc-title">目录</div>',
+    ]
+    for level, text, uid in toc_items:
+        cls = f'toc-h{level}'
+        lines.append(f'  <a class="{cls}" href="#{uid}" title="{text}">{text}</a>')
+    lines.append('</nav>')
+    return '\n'.join(lines)
+
+
 def generate_page(slug, content):
     """生成单篇纪要的 HTML 页面"""
     title = parse_title_from_md(content)
@@ -216,6 +343,8 @@ def generate_page(slug, content):
     publish_date = parse_publish_date_from_md(content)
     summary_date = parse_summary_date_from_md(content)
     body_html = md_to_html(content)
+    body_html, toc_items = build_toc_and_add_ids(body_html)
+    toc_html = build_toc_html(toc_items)
 
     date_parts = []
     if publish_date:
@@ -236,10 +365,12 @@ def generate_page(slug, content):
   <div class="nav">
     <a href="index.html">← 返回目录</a>
   </div>
+  {toc_html}
   <div class="container">
     {body_html}
     {date_html}
   </div>
+  {TOC_JS if toc_items else ''}
 </body>
 </html>"""
     return html

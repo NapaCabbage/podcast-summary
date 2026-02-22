@@ -6,6 +6,7 @@
   <title>Jeff Dean：从 Google 搜索到 Gemini，亲历 AI 基础设施三十年</title>
   <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
@@ -161,12 +162,92 @@ hr {
     border-top: 1px solid #e8e8e8;
     margin: 36px 0;
 }
+
+/* TOC 目录侧边栏 */
+.toc-sidebar {
+    position: fixed;
+    top: 70px;
+    left: calc(50% + 415px);
+    width: 200px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 8px 0;
+}
+
+.toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #bbb;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding-left: 10px;
+}
+
+.toc-sidebar a {
+    display: block;
+    color: #bbb;
+    text-decoration: none;
+    padding: 3px 0 3px 10px;
+    border-left: 2px solid #e8e8e8;
+    transition: color 0.15s, border-color 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toc-sidebar a:hover { color: #333; border-left-color: #999; }
+
+.toc-sidebar .toc-h3 {
+    padding-left: 22px;
+    font-size: 11px;
+}
+
+.toc-sidebar a.active {
+    color: #222;
+    border-left-color: #333;
+    font-weight: 500;
+}
+
+@media (max-width: 1240px) {
+    .toc-sidebar { display: none; }
+}
 </style>
 </head>
 <body>
   <div class="nav">
     <a href="index.html">← 返回目录</a>
   </div>
+  <nav class="toc-sidebar" aria-label="目录">
+  <div class="toc-title">目录</div>
+  <a class="toc-h2" href="#全集重点" title="全集重点">全集重点</a>
+  <a class="toc-h2" href="#嘉宾话题简介" title="嘉宾/话题简介">嘉宾/话题简介</a>
+  <a class="toc-h2" href="#分节详述" title="分节详述">分节详述</a>
+  <a class="toc-h3" href="#000004-引言拥有-pareto-frontier" title="00:00:04 引言：拥有 Pareto Frontier">00:00:04 引言：拥有 Pareto Frontier</a>
+  <a class="toc-h3" href="#000030-前沿模型与-flash-模型为何二者都不可或缺" title="00:00:30 前沿模型与 Flash 模型：为何二者都不可或缺">00:00:30 前沿模型与 Flash 模型：为何二者都不可或缺</a>
+  <a class="toc-h3" href="#000352-蒸馏技术的历史与现代应用" title="00:03:52 蒸馏技术的历史与现代应用">00:03:52 蒸馏技术的历史与现代应用</a>
+  <a class="toc-h3" href="#000702-模型层级经济学与-flash-的大规模部署" title="00:07:02 模型层级经济学与 Flash 的大规模部署">00:07:02 模型层级经济学与 Flash 的大规模部署</a>
+  <a class="toc-h3" href="#000810-延迟的战略重要性" title="00:08:10 延迟的战略重要性">00:08:10 延迟的战略重要性</a>
+  <a class="toc-h3" href="#000919-任务饱和与基准测试的局限" title="00:09:19 任务饱和与基准测试的局限">00:09:19 任务饱和与基准测试的局限</a>
+  <a class="toc-h3" href="#001253-长上下文从百万-token-到万亿-token-的幻觉" title="00:12:53 长上下文：从百万 Token 到"万亿 Token 的幻觉"">00:12:53 长上下文：从百万 Token 到"万亿 Token 的幻觉"</a>
+  <a class="toc-h3" href="#001804-多模态推理视觉运动与非人类模态" title="00:18:04 多模态推理：视觉、运动与非人类模态">00:18:04 多模态推理：视觉、运动与非人类模态</a>
+  <a class="toc-h3" href="#002047-llm-检索与搜索排名的深层类比" title="00:20:47 LLM 检索与搜索排名的深层类比">00:20:47 LLM 检索与搜索排名的深层类比</a>
+  <a class="toc-h3" href="#002406-google-搜索演化史分片内存索引与查询软化" title="00:24:06 Google 搜索演化史：分片、内存索引与查询软化">00:24:06 Google 搜索演化史：分片、内存索引与查询软化</a>
+  <a class="toc-h3" href="#003006-能耗视角皮焦耳批处理与推测解码" title="00:30:06 能耗视角：皮焦耳、批处理与推测解码">00:30:06 能耗视角：皮焦耳、批处理与推测解码</a>
+  <a class="toc-h3" href="#003433-tpu-协同设计预测-2-6-年后的-ml-需求" title="00:34:33 TPU 协同设计：预测 2-6 年后的 ML 需求">00:34:33 TPU 协同设计：预测 2-6 年后的 ML 需求</a>
+  <a class="toc-h3" href="#004221-开放研究问题复杂工作流与非可验证-rl" title="00:42:21 开放研究问题：复杂工作流与非可验证 RL">00:42:21 开放研究问题：复杂工作流与非可验证 RL</a>
+  <a class="toc-h3" href="#004613-从符号系统到统一-llm-的范式转变" title="00:46:13 从符号系统到统一 LLM 的范式转变">00:46:13 从符号系统到统一 LLM 的范式转变</a>
+  <a class="toc-h3" href="#004939-通用模型-vs-专业模型检索推理是正确路径" title="00:49:39 通用模型 vs 专业模型：检索+推理是正确路径">00:49:39 通用模型 vs 专业模型：检索+推理是正确路径</a>
+  <a class="toc-h3" href="#005609-低资源语言与上下文学习的惊人能力" title="00:56:09 低资源语言与上下文学习的惊人能力">00:56:09 低资源语言与上下文学习的惊人能力</a>
+  <a class="toc-h3" href="#005922-起源1990-年的神经网络论文与-google-ai-团队的统一" title="00:59:22 起源：1990 年的神经网络论文与 Google AI 团队的统一">00:59:22 起源：1990 年的神经网络论文与 Google AI 团队的统一</a>
+  <a class="toc-h3" href="#011007-ai-编程助手与人机协作风格" title="01:10:07 AI 编程助手与人机协作风格">01:10:07 AI 编程助手与人机协作风格</a>
+  <a class="toc-h3" href="#011552-清晰规格说明编程代理时代最重要的新技能" title="01:15:52 清晰规格说明：编程代理时代最重要的新技能">01:15:52 清晰规格说明：编程代理时代最重要的新技能</a>
+  <a class="toc-h3" href="#011923-预测个性化模型与万级-tokens" title="01:19:23 预测：个性化模型与万级 Token/s">01:19:23 预测：个性化模型与万级 Token/s</a>
+  <a class="toc-h2" href="#专业术语注释" title="专业术语注释">专业术语注释</a>
+  <a class="toc-h2" href="#延伸思考" title="延伸思考">延伸思考</a>
+</nav>
   <div class="container">
     <p><a href="https://www.latent.space/p/jeffdean">▶ 原文链接</a></p>
 <h1>Jeff Dean：从 Google 搜索到 Gemini，亲历 AI 基础设施三十年</h1>
@@ -174,7 +255,7 @@ hr {
 <strong>原文发表：</strong> Feb 13, 2026
 <strong>纪要生成：</strong> 2026-02-22</p>
 <hr />
-<div class="highlights"><h2>全集重点</h2>
+<div class="highlights"><h2 id="全集重点">全集重点</h2>
 <ul>
 <li><strong>蒸馏是 Flash 模型的引擎</strong>：用最大模型的 logits 作为软标签，使小模型超越上一代大模型，Gemini Flash 由此实现"低价≈顶配"</li>
 <li><strong>能耗才是真正瓶颈</strong>：传输数据比计算贵 1000 倍（皮焦耳量级），这解释了为何批处理、推测解码和低精度如此重要</li>
@@ -183,11 +264,11 @@ hr {
 <li><strong>个性化 AI + 万级 token/s</strong>：Jeff 的两个核心预测——能访问用户所有个人数据的个性化模型，以及硬件驱动的 10,000 token/s 推理速度将彻底改变人机协作</li>
 </ul>
 <hr />
-</div><h2>嘉宾/话题简介</h2>
+</div><h2 id="嘉宾话题简介">嘉宾/话题简介</h2>
 <p>Jeff Dean 是 Google Chief AI Scientist，同时也是 Google 传奇级工程师之一。他在 2001 年主导了 Google 搜索索引的内存化改造，2006 年联合发表 MapReduce，2011 年加入 Google Brain 并推动了深度学习在 Google 的规模化落地，2014 年与 Geoffrey Hinton 共同提出模型蒸馏框架，此后还主导了 TPU 的研发以及 Google 内部 AI 团队（Brain + DeepMind）的整合，最终孕育了 Gemini 系列模型。本集由 Latent Space 主持人 Alessio Fanelli 和 Swyx（Shawn Wang）共同主持，围绕 AI 基础设施的系统性思维、模型架构演化、硬件协同设计和未来预测展开深度对话。</p>
 <hr />
-<h2>分节详述</h2>
-<h3>00:00:04 引言：拥有 Pareto Frontier</h3>
+<h2 id="分节详述">分节详述</h2>
+<h3 id="000004-引言拥有-pareto-frontier">00:00:04 引言：拥有 Pareto Frontier</h3>
 <p><strong>本节重点</strong>
 - Jeff Dean 被介绍为 Google Chief AI Scientist，以 Gemini 系列"拥有 Pareto Frontier"开场
 - Pareto Frontier 指在效率与能力两个维度同时领先
@@ -201,7 +282,7 @@ hr {
 <p><em>"It's not just one thing. It's like a whole bunch of things up and down the stack. And all of those really combine to help make us able to make highly capable large models, as well as software techniques to get those large model capabilities into much smaller, lighter weight models."</em></p>
 </blockquote>
 <hr />
-<h3>00:00:30 前沿模型与 Flash 模型：为何二者都不可或缺</h3>
+<h3 id="000030-前沿模型与-flash-模型为何二者都不可或缺">00:00:30 前沿模型与 Flash 模型：为何二者都不可或缺</h3>
 <p><strong>本节重点</strong>
 - 前沿模型（Pro/Ultra）与高效模型（Flash）定位不同，服务不同用例
 - 蒸馏是将大模型能力注入小模型的核心技术路径
@@ -218,7 +299,7 @@ hr {
 <p><em>"Through distillation, you have to have the frontier model in order to then distill it into your smaller model. So it's not like an either-or choice. You sort of need that in order to actually get a highly capable, more modest size model."</em></p>
 </blockquote>
 <hr />
-<h3>00:03:52 蒸馏技术的历史与现代应用</h3>
+<h3 id="000352-蒸馏技术的历史与现代应用">00:03:52 蒸馏技术的历史与现代应用</h3>
 <p><strong>本节重点</strong>
 - 蒸馏最初来自大规模图像数据集的多专家集成压缩需求
 - 核心机制：用大模型的 logits（软标签）替代硬标签来训练小模型
@@ -235,7 +316,7 @@ hr {
 <p><em>"One of the key advantages of distillation is that you can have a much smaller model and you can have a very large training data set and you can get utility out of making many passes over that data set because you're now getting the logits from the much larger model in order to sort of coax the right behavior out of the smaller model."</em></p>
 </blockquote>
 <hr />
-<h3>00:07:02 模型层级经济学与 Flash 的大规模部署</h3>
+<h3 id="000702-模型层级经济学与-flash-的大规模部署">00:07:02 模型层级经济学与 Flash 的大规模部署</h3>
 <p><strong>本节重点</strong>
 - Google 同时维护多种规模的模型，包括不对外发布的内部训练模型
 - Flash 的经济性使其成为 Gmail、YouTube、Search 等产品的主力
@@ -252,7 +333,7 @@ hr {
 </ul>
 <p>这种大规模部署不仅是商业成果，也是提供"真实世界反馈"的宝贵数据来源，推动下一代模型改进。</p>
 <hr />
-<h3>00:08:10 延迟的战略重要性</h3>
+<h3 id="000810-延迟的战略重要性">00:08:10 延迟的战略重要性</h3>
 <p><strong>本节重点</strong>
 - 低延迟不仅是用户体验问题，更是解锁"代理式任务"的前提
 - 用户需求会随模型能力提升而升级，延迟感知随之放大
@@ -264,7 +345,7 @@ hr {
 <p><strong>TPU 硬件的贡献</strong>：Jeff 提到 TPU 的高性能芯片间互联对于长上下文注意力运算和稀疏专家（Mixture of Experts）模型的服务化起到了关键支撑作用。</p>
 <p><strong>万级 token/s 的未来</strong>：Jeff 在后段预测，10,000 token/s 的推理速度将成为现实，届时模型可以进行更多并行推演（rollout）、生成更多代码并自动验证。到那时，推理成本和延迟的约束被解除，DeepThink 类的深度推理模式将成为常态而非奢侈品。</p>
 <hr />
-<h3>00:09:19 任务饱和与基准测试的局限</h3>
+<h3 id="000919-任务饱和与基准测试的局限">00:09:19 任务饱和与基准测试的局限</h3>
 <p><strong>本节重点</strong>
 - 随着模型能力提升，用户会提出更复杂的需求，"饱和"并非终局
 - 公开基准测试一旦达到 95% 以上就失去意义（数据泄露/能力已验证）
@@ -281,7 +362,7 @@ hr {
 <p><em>"That's true, if your distribution of what people are asking the models to do is stationary. But what often happens is as the models become more capable, people ask them to do more."</em></p>
 </blockquote>
 <hr />
-<h3>00:12:53 长上下文：从百万 Token 到"万亿 Token 的幻觉"</h3>
+<h3 id="001253-长上下文从百万-token-到万亿-token-的幻觉">00:12:53 长上下文：从百万 Token 到"万亿 Token 的幻觉"</h3>
 <p><strong>本节重点</strong>
 - 当前百万级上下文是有价值的，但距离"访问全部互联网"仍差几个量级
 - 纯扩展注意力窗口（二次复杂度）无法到达万亿 token
@@ -305,7 +386,7 @@ hr {
 <p><em>"If you could give the illusion that you can attend to trillions of tokens, that would be amazing. You'd find all kinds of uses for that. You would have attend to the internet. You could attend to the pixels of YouTube... on a personal Gemini level, you could attend to all of your personal state."</em></p>
 </blockquote>
 <hr />
-<h3>00:18:04 多模态推理：视觉、运动与非人类模态</h3>
+<h3 id="001804-多模态推理视觉运动与非人类模态">00:18:04 多模态推理：视觉、运动与非人类模态</h3>
 <p><strong>本节重点</strong>
 - 视觉和运动（视频）是最核心的模态，因为进化 23 次独立演化出了眼睛
 - Gemini 是目前唯一的原生视频理解模型
@@ -324,7 +405,7 @@ hr {
 <p>关键洞察：即使某个模态（如 LIDAR）的数据量不够多，不值得放入主要预训练数据组合，加入少量仍然有价值——因为它让模型知道"这个模态是真实存在的，在世界上有其含义"。</p>
 <p><strong>视频理解的实际用例</strong>：Jeff 分享了一个具体示例：给 Gemini 一个 18 个精彩运动时刻的 YouTube 集锦视频（跨越 20 年，包括乔丹跳投等），直接问"帮我列出这 18 个事件的时间、描述"，模型可以生成一个 18 行的结构化表格。这种"视频→结构化数据"的能力是大多数人没有想到的。</p>
 <hr />
-<h3>00:20:47 LLM 检索与搜索排名的深层类比</h3>
+<h3 id="002047-llm-检索与搜索排名的深层类比">00:20:47 LLM 检索与搜索排名的深层类比</h3>
 <p><strong>本节重点</strong>
 - 现代 LLM 检索系统与 Google 搜索排名系统在架构上高度相似
 - 都是从海量候选逐步漏斗式过滤到极少数最相关结果
@@ -349,7 +430,7 @@ hr {
 <p><em>"It has to be some system like that, that really enables you to give the illusion of attending to trillions of tokens. Sort of the way Google search gives you... you are searching the internet, but you're finding a very small subset of things that are relevant."</em></p>
 </blockquote>
 <hr />
-<h3>00:24:06 Google 搜索演化史：分片、内存索引与查询软化</h3>
+<h3 id="002406-google-搜索演化史分片内存索引与查询软化">00:24:06 Google 搜索演化史：分片、内存索引与查询软化</h3>
 <p><strong>本节重点</strong>
 - 2001 年，Google 将整个搜索索引从磁盘迁移到内存，是一次关键质量飞跃
 - 内存索引使得查询扩展（同义词、形态变化）成为可能，实现"查询语义软化"
@@ -369,7 +450,7 @@ hr {
 <p><em>"Once you have the whole index in memory, it's totally fine to have 50 terms you throw into the query... because now you can add synonyms like restaurant and restaurants and cafe and bistro... really getting at the meaning of the word as opposed to the exact semantic form the user typed in."</em></p>
 </blockquote>
 <hr />
-<h3>00:30:06 能耗视角：皮焦耳、批处理与推测解码</h3>
+<h3 id="003006-能耗视角皮焦耳批处理与推测解码">00:30:06 能耗视角：皮焦耳、批处理与推测解码</h3>
 <p><strong>本节重点</strong>
 - 计算瓶颈不是 FLOP，而是数据搬运的能耗（皮焦耳/bit）
 - 一次跨芯片数据搬运比一次矩阵乘法贵约 1000 倍
@@ -392,7 +473,7 @@ hr {
 <p><em>"Moving data from the SRAM on the other side of the chip... can be a thousand picojoules. So all of a sudden this is why your accelerators require batching... you better make use of that thing that you moved many, many times."</em></p>
 </blockquote>
 <hr />
-<h3>00:34:33 TPU 协同设计：预测 2-6 年后的 ML 需求</h3>
+<h3 id="003433-tpu-协同设计预测-2-6-年后的-ml-需求">00:34:33 TPU 协同设计：预测 2-6 年后的 ML 需求</h3>
 <p><strong>本节重点</strong>
 - 硬件设计需要预测 2-6 年后的 ML 计算需求，这在快速变化的领域极具挑战
 - ML 研究团队与 TPU 芯片架构团队深度协作，形成双向反馈循环
@@ -405,7 +486,7 @@ hr {
 <p><strong>反向约束</strong>：有时也会出现反方向的约束——因为芯片设计已经确定，模型架构需要适应已有芯片的特性。Jeff 提到，有时会提前按照下一代芯片将支持的低精度来训练模型，即使当前芯片不完全支持。</p>
 <p><strong>精度降低的趋势</strong>：对于精度下限的探索，Jeff 对极低精度（如 ternary，即三值）持开放态度，但认为配合组级别的缩放因子（scaling factors）是当前最有效的工程实践路径。</p>
 <hr />
-<h3>00:42:21 开放研究问题：复杂工作流与非可验证 RL</h3>
+<h3 id="004221-开放研究问题复杂工作流与非可验证-rl">00:42:21 开放研究问题：复杂工作流与非可验证 RL</h3>
 <p><strong>本节重点</strong>
 - 如何让模型完成包含大量子任务的长链条复杂工作流，是最重要的开放问题之一
 - 将 RL 扩展到非可验证（non-verifiable）领域是关键突破口
@@ -423,7 +504,7 @@ hr {
 <p>Alessio 提到 Noam Brown 曾表示 Deep Research 已经证明了这一点——用一个模型来评估另一个模型的输出质量，作为 RL 的奖励信号。Jeff 认可这个方向，并指出可以是同一个模型用不同提示词切换成"批评者"（critic）角色，对检索到的内容进行相关性评分，或从 2000 个检索结果中选出最相关的 50 个。</p>
 <p><strong>进展令人震撼</strong>：Jeff 回顾说，两年前模型还在挣扎于 GSM8K 问题（"Fred 有两只兔子，再得到三只，他有几只"），而现在模型已经能用纯自然语言攻克 IMO（国际数学奥林匹克）和 Erdős 问题。在一年半内完成这一飞跃是极其惊人的。他认为，在其他领域复制这一跃迁是接下来最令人期待的研究方向。</p>
 <hr />
-<h3>00:46:13 从符号系统到统一 LLM 的范式转变</h3>
+<h3 id="004613-从符号系统到统一-llm-的范式转变">00:46:13 从符号系统到统一 LLM 的范式转变</h3>
 <p><strong>本节重点</strong>
 - AlphaProof/AlphaGeometry 使用符号系统，而当年之后 Gemini 直接用通用模型超越
 - Jeff 认为神经网络比"独立的符号系统"更接近人脑的真实运作方式
@@ -435,7 +516,7 @@ hr {
 <p><strong>统一模型的历史先例</strong>：Jeff 指出这一转变并不新鲜——2013-2016 年已经发生过一次：那之前，人们为每个任务单独训练模型（街道标识识别模型、语音识别模型等）。如今"统一模型做一切"的时代已经到来，关键问题是这些通用模型能多快泛化到从未被要求做的新任务。</p>
 <p><strong>无需领域专家</strong>：Swyx 采访了参与 IMO 攻克的研究员，对方坦承自己"不知道 IMO 竞赛在哪里举办，也不懂比赛规则"——只是在训练模型。这正是"苦涩教训"（Bitter Lesson）的体现：足够的数据+足够的计算，可以解决几乎任何领域问题。Jeff 明确表示："<strong>通用模型在绝大多数情况下会战胜专业模型</strong>"。</p>
 <hr />
-<h3>00:49:39 通用模型 vs 专业模型：检索+推理是正确路径</h3>
+<h3 id="004939-通用模型-vs-专业模型检索推理是正确路径">00:49:39 通用模型 vs 专业模型：检索+推理是正确路径</h3>
 <p><strong>本节重点</strong>
 - 参数空间有限时，应优先存储"推理能力"而非"记忆冷僻事实"
 - 大模型 + 检索工具 = 个人化 AI 的最佳架构，无需将个人数据混入训练集
@@ -456,7 +537,7 @@ hr {
 <p><em>"Having the model devote precious parameter space to remembering obscure facts that could be looked up is actually not the best use of that parameter space."</em></p>
 </blockquote>
 <hr />
-<h3>00:56:09 低资源语言与上下文学习的惊人能力</h3>
+<h3 id="005609-低资源语言与上下文学习的惊人能力">00:56:09 低资源语言与上下文学习的惊人能力</h3>
 <p><strong>本节重点</strong>
 - Kalamang 语：全球约 120 人使用，无书面文字，可以直接放入上下文让模型学习
 - 索马里语、埃塞俄比亚语等语言通过增加训练数据可显著提升模型表现
@@ -467,7 +548,7 @@ hr {
 <p><strong>语言多样性的数据权衡</strong>：对于索马里语、埃塞俄比亚阿姆哈拉语等有一定书面文字但训练数据不足的语言，增加训练数据可以显著提升模型在这些语言上的表现。但这是一个"此消彼长"的权衡——包含更多某种语言的数据，会排挤其他内容（如 Perl 编程数据）。</p>
 <p><strong>语言与视觉的融合实验</strong>：Jeff 提到他早期做过的一个工作（DeViSE，Device），将语言模型的词向量与图像模型的表示融合。训练完成后，给模型一张从未见过类别的图像（如显微镜——训练集有望远镜和双筒望远镜，但没有显微镜），模型能够推断出"microscope"作为标签，即使它从未看过标记为显微镜的训练图像。这展示了跨模态语义迁移的惊人潜力。</p>
 <hr />
-<h3>00:59:22 起源：1990 年的神经网络论文与 Google AI 团队的统一</h3>
+<h3 id="005922-起源1990-年的神经网络论文与-google-ai-团队的统一">00:59:22 起源：1990 年的神经网络论文与 Google AI 团队的统一</h3>
 <p><strong>本节重点</strong>
 - Jeff 在 1990 年本科论文中就研究了并行神经网络训练，坚信"扩展是正确方向"
 - 2011 年加入 Google Brain，正式将神经网络规模化带入 Google
@@ -489,7 +570,7 @@ hr {
 <p><em>"I actually wrote a one-page memo saying we were being stupid by fragmenting our resources... Why don't we combine things and have one effort to train an awesome single unified model that is multimodal from the start, that's good at everything. And that was the origin of the Gemini effort."</em></p>
 </blockquote>
 <hr />
-<h3>01:10:07 AI 编程助手与人机协作风格</h3>
+<h3 id="011007-ai-编程助手与人机协作风格">01:10:07 AI 编程助手与人机协作风格</h3>
 <p><strong>本节重点</strong>
 - 编程工具在过去两年进步显著，现在可以承担复杂任务
 - 与编程模型的交互风格决定了输出质量
@@ -510,7 +591,7 @@ hr {
 <p><em>"If you have a team of 50 interns, how would you manage that if they were people? You would probably want them to form small sub teams, so you don't have to interact with 50 of them."</em></p>
 </blockquote>
 <hr />
-<h3>01:15:52 清晰规格说明：编程代理时代最重要的新技能</h3>
+<h3 id="011552-清晰规格说明编程代理时代最重要的新技能">01:15:52 清晰规格说明：编程代理时代最重要的新技能</h3>
 <p><strong>本节重点</strong>
 - "写好软件规格说明"曾是被忽视的能力，现在变成了决定 AI 输出质量的核心技能
 - 规格说明的模糊性直接导致 AI 输出的不确定性（"10 个可能结果中只有 1 个是你想要的"）
@@ -527,7 +608,7 @@ hr {
 <p><em>"If you specify what software you want the agent to write for you, you'd better be pretty darn careful of how you specify that because that's going to dictate the quality of the output."</em></p>
 </blockquote>
 <hr />
-<h3>01:19:23 预测：个性化模型与万级 Token/s</h3>
+<h3 id="011923-预测个性化模型与万级-tokens">01:19:23 预测：个性化模型与万级 Token/s</h3>
 <p><strong>本节重点</strong>
 - 预测一：能访问用户所有个人数据的个性化 AI 将极其有价值
 - 预测二：更专业的硬件将使模型在可承受价格下大幅降低延迟
@@ -555,7 +636,7 @@ hr {
 <p><em>"It may not end up with 10,000 tokens of code. It may be a thousand tokens of code that with 9,000 tokens of reasoning behind it, which would actually be probably much better code to read."</em></p>
 </blockquote>
 <hr />
-<h2>专业术语注释</h2>
+<h2 id="专业术语注释">专业术语注释</h2>
 <table>
 <thead>
 <tr>
@@ -647,7 +728,7 @@ hr {
 </tbody>
 </table>
 <hr />
-<h2>延伸思考</h2>
+<h2 id="延伸思考">延伸思考</h2>
 <ol>
 <li>
 <p><strong>蒸馏的极限在哪里？</strong> Flash 超越上一代 Pro 的趋势能持续多久？当前沿模型的参数规模增长放缓时，蒸馏还能带来多少能力提升空间？</p>
@@ -667,5 +748,23 @@ hr {
 </ol>
     <p class="meta">原文发表：Feb 13, 2026 &nbsp;·&nbsp; 纪要生成：2026-02-22</p>
   </div>
+  <script>
+(function () {
+  var links = document.querySelectorAll('.toc-sidebar a');
+  var headings = Array.from(document.querySelectorAll('h2[id], h3[id]'));
+  if (!headings.length || !links.length) return;
+  function setActive() {
+    var active = headings[0];
+    for (var i = 0; i < headings.length; i++) {
+      if (headings[i].getBoundingClientRect().top <= 90) active = headings[i];
+    }
+    links.forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
+    });
+  }
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+}());
+</script>
 </body>
 </html>
