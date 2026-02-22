@@ -11,7 +11,8 @@
       "WebFetch(domain:www.dwarkesh.com)",
       "Bash(pip3 install:*)",
       "Bash(ARK_API_KEY=\"d3309bf2-d016-4ef4-8d60-d608c792edb0\" python3:*)",
-      "WebFetch(domain:lexfridman.com)"
+      "WebFetch(domain:lexfridman.com)",
+      "Bash(pip install:*)"
     ]
   }
 }

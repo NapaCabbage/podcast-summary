@@ -1,0 +1,25 @@
+# 播客纪要 — Cron Job 配置
+#
+# 安装方法（以 podcast 用户身份）：
+#   crontab -e
+# 然后把下面的内容粘贴进去（去掉开头的 # 注释符）
+#
+# 变量说明：
+#   APP_DIR  = 应用目录
+#   PYTHON   = 虚拟环境中的 Python
+#   LOG_DIR  = 日志目录
+
+# ── 环境变量 ───────────────────────────────────────────────────
+APP_DIR=/opt/podcast-summary
+PYTHON=/opt/podcast-summary/.venv/bin/python3
+LOG_DIR=/opt/podcast-summary/logs
+
+# ── 每天早上 8:00 检查并处理新集数 ────────────────────────────
+# （会自动读取 .env 中的 ARK_API_KEY）
+0 8 * * * cd $APP_DIR && source $APP_DIR/.env && $PYTHON feed_monitor.py >> $LOG_DIR/cron.log 2>&1
+
+# ── 可选：每天凌晨 3:00 额外运行一次（捕获深夜发布的内容） ──
+# 0 3 * * * cd $APP_DIR && source $APP_DIR/.env && $PYTHON feed_monitor.py >> $LOG_DIR/cron.log 2>&1
+
+# ── 可选：每周日 0:00 清理 30 天前的日志 ──────────────────────
+# 0 0 * * 0 find $LOG_DIR -name "*.log" -mtime +30 -delete

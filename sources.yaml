@@ -1,0 +1,49 @@
+# 播客来源配置
+# type: rss           — RSS/Atom Feed（Substack、个人博客等）
+# type: youtube_channel — YouTube 频道（无需 API Key）
+#
+# channel_handle: YouTube @handle（如 aiDotEngineer），程序自动解析为 Channel ID
+# title_filter:   只处理标题含该字符串的视频（不区分大小写），留空则处理全部
+# max_episodes:   每次最多检查多少集（避免首次运行时抓取过多历史内容）
+
+sources:
+
+  # ── RSS 来源 ──────────────────────────────────────────────────
+
+  - name: "Latent Space"
+    type: rss
+    feed_url: "https://www.latent.space/feed"
+    max_episodes: 3
+
+  - name: "Lex Fridman Podcast"
+    type: rss
+    feed_url: "https://lexfridman.com/feed/podcast/"
+    max_episodes: 3
+
+  - name: "Dwarkesh Podcast"
+    type: rss
+    feed_url: "https://www.dwarkesh.com/feed"
+    max_episodes: 3
+
+  # ── YouTube 频道 ──────────────────────────────────────────────
+
+  - name: "AI Engineer"
+    type: youtube_channel
+    channel_handle: "aiDotEngineer"
+    max_episodes: 3
+
+  - name: "YC Lightcone"
+    type: youtube_channel
+    channel_handle: "ycombinator"
+    title_filter: "Lightcone"   # YC 频道内容很多，只取 Lightcone 系列
+    max_episodes: 3
+
+  - name: "Lenny's Podcast"
+    type: youtube_channel
+    channel_handle: "LennysPodcast"
+    max_episodes: 3
+
+  - name: "Invest Like the Best"
+    type: youtube_channel
+    channel_handle: "ILTB_Podcast"
+    max_episodes: 3
