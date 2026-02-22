@@ -29,12 +29,22 @@ def extract_pub_date(soup):
     for script in soup.find_all('script', type='application/ld+json'):
         try:
             data = json.loads(script.string or '')
-            # 可能是列表或单对象
+            # 可能是列表、单对象，或含 @graph 的对象
+            candidates = []
             if isinstance(data, list):
-                data = data[0] if data else {}
-            date = data.get('datePublished') or data.get('uploadDate')
-            if date:
-                return format_pub_date(date)
+                candidates = data
+            elif isinstance(data, dict):
+                graph = data.get('@graph')
+                if isinstance(graph, list):
+                    candidates = graph
+                else:
+                    candidates = [data]
+            for item in candidates:
+                if not isinstance(item, dict):
+                    continue
+                date = item.get('datePublished') or item.get('uploadDate')
+                if date:
+                    return format_pub_date(date)
         except Exception:
             continue
 
