@@ -362,10 +362,108 @@ def handle_message_async(chat_id, text):
 
 
 # ── HTTP 服务 ─────────────────────────────────────────────────────────
+#
+# 端点总览：
+#   POST /feishu              飞书事件 Webhook（给飞书平台用）
+#   GET  /api/check           检查新集数（dry-run）?source=可选
+#   GET  /api/sources         列出订阅来源
+#   GET  /api/summaries       列出已生成纪要
+#   POST /api/process         完整流水线  {"source":"可选"}
+#   POST /api/scrape          只抓取原文  {"source":"可选"}
+#   POST /api/url             处理指定链接 {"url":"...","title":"可选","scrape_only":false}
+#
+# 所有 /api/* 返回 JSON：{"ok": true/false, "output": "文本结果"}
+
+def _api_response(ok, output):
+    return json.dumps({'ok': ok, 'output': output}, ensure_ascii=False)
+
+
+def _run_in_thread_and_wait(fn, *args, timeout=360):
+    """在子线程中运行 fn(*args)，阻塞等待结果（避免长任务卡主线程池）"""
+    result = [None]
+    exc    = [None]
+    def target():
+        try:
+            result[0] = fn(*args)
+        except Exception as e:
+            exc[0] = e
+    t = threading.Thread(target=target, daemon=True)
+    t.start()
+    t.join(timeout)
+    if t.is_alive():
+        return '⏰ 执行超时，任务仍在后台运行，请稍后查看日志。'
+    if exc[0]:
+        return f'❌ 执行异常：{exc[0]}'
+    return result[0]
+
 
 class FeishuHandler(BaseHTTPRequestHandler):
 
+    # ── GET /api/* ────────────────────────────────────────────────────
+
+    def do_GET(self):
+        from urllib.parse import urlparse, parse_qs
+        parsed = urlparse(self.path)
+        params = parse_qs(parsed.query)
+
+        def qp(key):
+            vals = params.get(key, [''])
+            return vals[0].strip() if vals else ''
+
+        if parsed.path == '/api/check':
+            source = qp('source')
+            output = run_command('dry-run', source)
+            self._reply(200, _api_response(True, output))
+
+        elif parsed.path == '/api/sources':
+            output = run_command('sources')
+            self._reply(200, _api_response(True, output))
+
+        elif parsed.path == '/api/summaries':
+            output = run_command('summaries')
+            self._reply(200, _api_response(True, output))
+
+        else:
+            self._reply(404, _api_response(False, 'Unknown endpoint'))
+
+    # ── POST /feishu  +  POST /api/* ─────────────────────────────────
+
     def do_POST(self):
+        length = int(self.headers.get('Content-Length', 0))
+        raw_body = self.rfile.read(length)
+
+        # ── /api/* 路由 ───────────────────────────────────────────────
+        if self.path.startswith('/api/'):
+            try:
+                body = json.loads(raw_body) if raw_body else {}
+            except Exception:
+                body = {}
+
+            if self.path == '/api/process':
+                source = body.get('source', '')
+                output = _run_in_thread_and_wait(run_command, 'process', source)
+                self._reply(200, _api_response(True, output))
+
+            elif self.path == '/api/scrape':
+                source = body.get('source', '')
+                output = _run_in_thread_and_wait(run_command, 'scrape', source)
+                self._reply(200, _api_response(True, output))
+
+            elif self.path == '/api/url':
+                url        = body.get('url', '')
+                title      = body.get('title', '')
+                scrape_only = body.get('scrape_only', False)
+                if not url:
+                    self._reply(400, _api_response(False, '缺少 url 参数'))
+                    return
+                output = _run_in_thread_and_wait(run_url, url, title, scrape_only)
+                self._reply(200, _api_response(True, output))
+
+            else:
+                self._reply(404, _api_response(False, 'Unknown endpoint'))
+            return
+
+        # ── /feishu 飞书 Webhook ──────────────────────────────────────
         if self.path != '/feishu':
             self._reply(404, 'Not found')
             return
