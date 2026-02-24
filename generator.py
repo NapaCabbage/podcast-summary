@@ -248,6 +248,34 @@ def parse_summary_date_from_md(content):
     return match.group(1).strip() if match else ''
 
 
+def parse_category_from_md(content, title=''):
+    """
+    提取分类标签。
+    优先读 **分类：** 字段；若无，按关键词从标题/来源行推断（兼容旧纪要）；
+    最终兜底返回 '其他'。
+    """
+    match = re.search(r'\*\*分类：\*\*\s*(.+)', content)
+    if match:
+        return match.group(1).strip()
+
+    meta_match = re.search(r'\*\*来源：\*\*(.+)', content)
+    haystack = (title + ' ' + (meta_match.group(1) if meta_match else '')).lower()
+
+    LEGACY_PATTERNS = [
+        ('Anthropic',       ['anthropic', 'claude', 'dario amodei']),
+        ('OpenAI',          ['openai', 'chatgpt', 'gpt-4', 'gpt-5', 'sam altman']),
+        ('Google DeepMind', ['google', 'deepmind', 'gemini', 'jeff dean']),
+        ('Meta AI',         ['meta ai', 'llama', 'zuckerberg', 'yann lecun']),
+        ('xAI',             ['xai', 'grok', 'elon musk']),
+        ('Microsoft',       ['microsoft', 'github copilot', 'satya']),
+        ('NVIDIA',          ['nvidia', 'jensen huang']),
+    ]
+    for cat, kws in LEGACY_PATTERNS:
+        if any(kw in haystack for kw in kws):
+            return cat
+    return '其他'
+
+
 def md_to_html(content):
     """将 Markdown 转为 HTML，并对全集重点区域加特殊样式"""
     html = markdown.markdown(content, extensions=['extra'])
@@ -377,21 +405,49 @@ def generate_page(slug, content):
 
 
 def generate_index(entries):
-    """生成目录索引页"""
-    cards_html = ''
-    for slug, title, meta, publish_date, summary_date in entries:
-        date_parts = []
-        if publish_date:
-            date_parts.append(f'原文发表：{publish_date}')
-        if summary_date:
-            date_parts.append(f'纪要生成：{summary_date}')
-        date_str = ' &nbsp;·&nbsp; '.join(date_parts)
-        cards_html += f"""
+    """生成按分类分组的目录索引页"""
+
+    # 分类显示顺序（未在列表中的分类追加到末尾，按字母排序）
+    CATEGORY_ORDER = [
+        'Anthropic', 'OpenAI', 'Google DeepMind', 'Meta AI',
+        'xAI', 'Microsoft', 'NVIDIA', 'Mistral', 'Cohere',
+        'AI 工程', 'AI 资讯', '访谈', '产品', '创投', '投资', '其他',
+    ]
+
+    # 按分类分组
+    groups = {}
+    for entry in entries:
+        slug, title, meta, publish_date, summary_date, category = entry
+        groups.setdefault(category, []).append(entry)
+
+    # 排序：先按 CATEGORY_ORDER，其余分类按字母排在后面
+    ordered_cats = [c for c in CATEGORY_ORDER if c in groups]
+    extra_cats = sorted(c for c in groups if c not in CATEGORY_ORDER)
+    all_cats = ordered_cats + extra_cats
+
+    sections_html = ''
+    for cat in all_cats:
+        cat_entries = groups[cat]
+        cards = ''
+        for slug, title, meta, publish_date, summary_date, _ in cat_entries:
+            date_parts = []
+            if publish_date:
+                date_parts.append(f'原文发表：{publish_date}')
+            if summary_date:
+                date_parts.append(f'纪要生成：{summary_date}')
+            date_str = ' &nbsp;·&nbsp; '.join(date_parts)
+            cards += f"""
     <a class="card" href="{slug}.html">
       <h3>{title}</h3>
       <div class="card-meta">{meta}</div>
       {f'<div class="card-dates">{date_str}</div>' if date_str else ''}
     </a>"""
+        sections_html += f"""
+  <div class="category-section">
+    <h2 class="category-title">{cat} <span class="category-count">{len(cat_entries)}</span></h2>
+    <div class="card-grid">{cards}
+    </div>
+  </div>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -399,15 +455,20 @@ def generate_index(entries):
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>播客纪要</title>
-  <style>{CSS}</style>
+  <style>{CSS}
+.category-section {{ margin-bottom: 48px; }}
+.category-title {{ font-size: 18px; font-weight: 700; margin-bottom: 16px;
+                   padding-bottom: 8px; border-bottom: 2px solid #e8e8e8; color: #111; }}
+.category-count {{ font-size: 13px; font-weight: 400; color: #999;
+                   background: #f0f0f0; border-radius: 10px;
+                   padding: 1px 8px; margin-left: 6px; }}
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>播客纪要</h1>
-    <p style="color:#888; margin-top:8px;">共 {len(entries)} 篇</p>
-    <div class="card-grid">
-      {cards_html}
-    </div>
+    <p style="color:#888; margin-top:8px;">共 {len(entries)} 篇 · {len(all_cats)} 个分类</p>
+    {sections_html}
   </div>
 </body>
 </html>"""
@@ -437,6 +498,7 @@ def main():
         meta = parse_meta_from_md(content)
         publish_date = parse_publish_date_from_md(content)
         summary_date = parse_summary_date_from_md(content)
+        category = parse_category_from_md(content, title)
 
         page_html = generate_page(slug, content)
         output_path = os.path.join(OUTPUT_DIR, f'{slug}.html')
@@ -444,8 +506,8 @@ def main():
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(page_html)
 
-        entries.append((slug, title, meta, publish_date, summary_date))
-        print(f'  ✅ {title}  →  {output_path}')
+        entries.append((slug, title, meta, publish_date, summary_date, category))
+        print(f'  ✅ [{category}] {title}  →  {output_path}')
 
     # 生成索引页
     index_html = generate_index(entries)

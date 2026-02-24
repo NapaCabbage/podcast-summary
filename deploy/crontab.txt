@@ -23,3 +23,6 @@ LOG_DIR=/opt/podcast-summary/logs
 
 # ── 可选：每周日 0:00 清理 30 天前的日志 ──────────────────────
 # 0 0 * * 0 find $LOG_DIR -name "*.log" -mtime +30 -delete
+
+# ── 开机自动启动飞书 Bot ────────────────────────────────────────
+# @reboot cd $APP_DIR && source $APP_DIR/.env && $PYTHON feishu_bot.py >> $LOG_DIR/feishu.log 2>&1 &

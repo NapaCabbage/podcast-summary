@@ -3,12 +3,14 @@
   发现新集数 → 抓取原文 → 生成纪要 → 重建 HTML
 
 用法：
-  python feed_monitor.py              # 检查所有来源，处理新集数
-  python feed_monitor.py --dry-run    # 只列出新集数，不执行处理
+  python feed_monitor.py                        # 完整流水线
+  python feed_monitor.py --dry-run              # 只列出新集数，不执行任何操作
+  python feed_monitor.py --scrape-only          # 只抓取原文，不调用 AI 模型
+  python feed_monitor.py --source "Latent Space" --scrape-only  # 只处理指定来源
 
 依赖：
   pip install feedparser
-  环境变量：ARK_API_KEY
+  环境变量：ARK_API_KEY（--scrape-only 模式下不需要）
 """
 import os
 import re
@@ -21,6 +23,35 @@ from scrapers.youtube import list_channel_episodes
 RAW_DIR = 'raw'
 SUMMARY_DIR = 'summaries'
 SOURCES_FILE = 'sources.yaml'
+
+# 公司关键词检测：按顺序匹配，第一个命中的即为分类
+# 格式：(分类标签, [关键词列表])  — 关键词不区分大小写
+COMPANY_PATTERNS = [
+    ('Anthropic',       ['anthropic', 'claude', 'dario amodei', 'amanda askell', 'chris olah']),
+    ('OpenAI',          ['openai', 'chatgpt', 'gpt-4', 'gpt-5', 'gpt4', 'sam altman',
+                         'greg brockman', 'ilya sutskever', 'sora', 'o1', 'o3']),
+    ('Google DeepMind', ['google', 'deepmind', 'gemini', 'jeff dean', 'sundar pichai',
+                         'demis hassabis', 'noam shazeer']),
+    ('Meta AI',         ['meta ai', 'llama', 'mark zuckerberg', 'yann lecun']),
+    ('xAI',             ['xai', 'grok', 'elon musk']),
+    ('Microsoft',       ['microsoft', 'github copilot', 'satya nadella', 'copilot']),
+    ('NVIDIA',          ['nvidia', 'jensen huang', 'cuda']),
+    ('Mistral',         ['mistral']),
+    ('Cohere',          ['cohere']),
+    ('Stability AI',    ['stability ai', 'stable diffusion']),
+]
+
+
+def detect_category(title, default_category):
+    """
+    根据集数标题关键词检测所属公司/分类。
+    若标题命中 COMPANY_PATTERNS，返回对应分类；否则返回 default_category。
+    """
+    title_lower = title.lower()
+    for category, keywords in COMPANY_PATTERNS:
+        if any(kw in title_lower for kw in keywords):
+            return category
+    return default_category
 
 
 def slugify(title):
@@ -45,7 +76,7 @@ def detect_type(url):
     return 'generic'
 
 
-def scrape_episode(title, url, pub_date):
+def scrape_episode(title, url, pub_date, category=''):
     """抓取单集内容并保存到 raw/，返回 (slug, char_count)"""
     slug = slugify(title)
     output_path = os.path.join(RAW_DIR, f'{slug}.txt')
@@ -67,6 +98,7 @@ def scrape_episode(title, url, pub_date):
         f'URL：{url}\n'
         f'类型：{site_type}\n'
         f'发布日期：{final_date}\n'
+        f'分类：{category}\n'
         f'\n{"=" * 60}\n\n'
     )
 
@@ -100,6 +132,14 @@ def discover_source(source):
 
 def main():
     dry_run = '--dry-run' in sys.argv
+    scrape_only = '--scrape-only' in sys.argv
+
+    # --source "Name" 过滤只处理指定来源
+    source_filter = ''
+    if '--source' in sys.argv:
+        idx = sys.argv.index('--source')
+        if idx + 1 < len(sys.argv):
+            source_filter = sys.argv[idx + 1].lower()
 
     if not os.path.exists(SOURCES_FILE):
         print(f'[错误] 找不到配置文件：{SOURCES_FILE}')
@@ -109,14 +149,21 @@ def main():
         config = yaml.safe_load(f)
 
     sources = config.get('sources', [])
+    if source_filter:
+        sources = [s for s in sources if source_filter in s.get('name', '').lower()]
+        if not sources:
+            print(f'[错误] 找不到来源：{source_filter}')
+            sys.exit(1)
+
     existing_slugs = get_existing_slugs()
 
     print(f'已有 {len(existing_slugs)} 篇原文，检查 {len(sources)} 个来源...\n')
 
-    all_new = []  # [(title, url, pub_date, source_name)]
+    all_new = []  # [(title, url, pub_date, source_name, category)]
 
     for source in sources:
         name = source.get('name', source.get('feed_url', ''))
+        default_cat = source.get('category', '其他')
         try:
             episodes = discover_source(source)
         except Exception as e:
@@ -131,9 +178,11 @@ def main():
         if new_here:
             print(f'  {name}：{len(new_here)} 集新内容')
             for t, u, d in new_here:
+                cat = detect_category(t, default_cat)
                 date_str = f'  [{d}]' if d else ''
-                print(f'    + {t}{date_str}')
-            all_new.extend((t, u, d, name) for t, u, d in new_here)
+                cat_str = f'  →{cat}' if cat != default_cat else f'  [{cat}]'
+                print(f'    + {t}{date_str}{cat_str}')
+                all_new.append((t, u, d, name, cat))
         else:
             print(f'  {name}：无新内容')
 
@@ -148,6 +197,10 @@ def main():
         print('（--dry-run 模式，不执行处理）')
         return
 
+    mode = '（--scrape-only 模式，只抓取原文）' if scrape_only else ''
+    if mode:
+        print(mode)
+
     # ── 第一步：抓取原文 ─────────────────────────────────────────
     print('\n' + '─' * 50)
     print('第一步：抓取原文\n')
@@ -155,10 +208,10 @@ def main():
     os.makedirs(RAW_DIR, exist_ok=True)
     new_slugs = []
 
-    for title, url, pub_date, source_name in all_new:
-        print(f'[{source_name}] {title}')
+    for title, url, pub_date, source_name, category in all_new:
+        print(f'[{source_name} / {category}] {title}')
         try:
-            slug, char_count = scrape_episode(title, url, pub_date)
+            slug, char_count = scrape_episode(title, url, pub_date, category)
             new_slugs.append(slug)
             print(f'  ✅ raw/{slug}.txt  （{char_count:,} 字符）')
         except Exception as e:
@@ -167,6 +220,11 @@ def main():
 
     if not new_slugs:
         print('没有成功抓取的内容，中止流水线。')
+        return
+
+    if scrape_only:
+        print(f'\n✅ 抓取完成，共 {len(new_slugs)} 篇。原文保存在 raw/ 目录。')
+        print('   如需生成纪要，运行：python3 auto_summarize.py ' + ' '.join(new_slugs))
         return
 
     # ── 第二步：生成纪要 ─────────────────────────────────────────
