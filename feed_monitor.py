@@ -207,12 +207,14 @@ def main():
 
     os.makedirs(RAW_DIR, exist_ok=True)
     new_slugs = []
+    slug_info = {}  # slug -> (title, category)，用于最终通知
 
     for title, url, pub_date, source_name, category in all_new:
         print(f'[{source_name} / {category}] {title}')
         try:
             slug, char_count = scrape_episode(title, url, pub_date, category)
             new_slugs.append(slug)
+            slug_info[slug] = (title, category)
             print(f'  ✅ raw/{slug}.txt  （{char_count:,} 字符）')
         except Exception as e:
             print(f'  ❌ 抓取失败：{e}')
@@ -248,6 +250,18 @@ def main():
     subprocess.run([sys.executable, 'generator.py'])
 
     print('\n✅ 流水线完成！')
+
+    # ── 第四步：飞书推送通知 ──────────────────────────────────────
+    try:
+        from feishu_notify import notify
+        # 只通知成功生成了纪要的集数（summaries/ 目录中存在对应文件）
+        notified = [
+            slug_info[s] for s in new_slugs
+            if s in slug_info and os.path.exists(os.path.join(SUMMARY_DIR, f'{s}.md'))
+        ]
+        notify(notified)
+    except Exception as e:
+        print(f'[飞书通知] 跳过：{e}')
 
 
 if __name__ == '__main__':

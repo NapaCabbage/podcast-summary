@@ -125,6 +125,10 @@ ls /opt/podcast-summary/summaries/ | sort
    - `youtube.com/@` 开头 → `youtube_channel`
    - 有 `/feed` 或已知 Substack 域名 → `rss`
    - 其他播客/博客先尝试找 RSS Feed URL
+6. 飞书群推送通知需在 `.env` 中配置（二选一）：
+   - `FEISHU_WEBHOOK_URL`（群自定义机器人 Webhook，推荐）
+   - 或 `FEISHU_APP_ID` + `FEISHU_APP_SECRET` + `FEISHU_CHAT_ID`
+   - 可选：`SITE_URL=http://你的域名` 在通知中附带链接
 
 ---
 
