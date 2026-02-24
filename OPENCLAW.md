@@ -34,6 +34,25 @@ cd /opt/podcast-summary && .venv/bin/python3 feed_monitor.py --scrape-only
 cd /opt/podcast-summary && source .env && .venv/bin/python3 feed_monitor.py --source "Lex Fridman Podcast"
 ```
 
+### 4b. 处理指定 URL（单集，不在订阅列表中）
+用户发来一条链接，或说"帮我处理这个 https://..."：
+- **飞书 Bot 在线时**：直接把链接发给 Bot，Bot 自动抓取 + 生成纪要 + 更新网页
+- **手动执行**：
+```bash
+cd /opt/podcast-summary && source .env
+python3 -c "
+import sys; sys.path.insert(0,'.')
+from feed_monitor import scrape_episode, detect_category
+url = 'https://填入链接'
+title = '填入标题'
+slug, n = scrape_episode(title, url, '', detect_category(title, '其他'))
+print('slug:', slug, '  字符数:', n)
+"
+# 然后生成纪要
+python3 auto_summarize.py <slug>
+python3 generator.py
+```
+
 ### 5. 查看当前来源列表
 用户说："看看有哪些来源" / "列出频道" / "sources"
 ```bash
