@@ -13,7 +13,22 @@
       "Bash(ARK_API_KEY=\"d3309bf2-d016-4ef4-8d60-d608c792edb0\" python3:*)",
       "WebFetch(domain:lexfridman.com)",
       "Bash(pip install:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(grep:*)",
+      "Bash(curl:*)",
+      "Bash(echo:*)",
+      "Bash(yt-dlp:*)",
+      "Bash(brew install:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(node --version:*)",
+      "Bash(pkill:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(wrangler:*)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
