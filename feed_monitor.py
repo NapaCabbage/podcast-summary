@@ -3,10 +3,12 @@
   发现新集数 → 抓取原文 → 生成纪要 → 重建 HTML
 
 用法：
-  python feed_monitor.py                        # 完整流水线
-  python feed_monitor.py --dry-run              # 只列出新集数，不执行任何操作
-  python feed_monitor.py --scrape-only          # 只抓取原文，不调用 AI 模型
-  python feed_monitor.py --source "Latent Space" --scrape-only  # 只处理指定来源
+  python feed_monitor.py                              # 完整流水线
+  python feed_monitor.py --dry-run                    # 只列出新集数，不执行任何操作
+  python feed_monitor.py --scrape-only                # 只抓取原文，不调用 AI 模型
+  python feed_monitor.py --source "Latent Space"      # 只处理指定来源
+  python feed_monitor.py --since 7d                   # 只处理最近 7 天内发布的集数
+  python feed_monitor.py --since 2025-01-01           # 只处理该日期之后的集数
 
 依赖：
   pip install feedparser
@@ -16,6 +18,7 @@ import os
 import re
 import sys
 import yaml
+from datetime import datetime, timedelta
 from scrapers import youtube, substack, generic
 from scrapers.rss import fetch_episodes
 from scrapers.youtube import list_channel_episodes
@@ -40,6 +43,35 @@ COMPANY_PATTERNS = [
     ('Cohere',          ['cohere']),
     ('Stability AI',    ['stability ai', 'stable diffusion']),
 ]
+
+
+def _parse_since(s):
+    """解析 --since 参数。支持 '7d'（最近7天）或 'YYYY-MM-DD'（具体日期）。"""
+    if not s:
+        return None
+    s = s.strip()
+    m = re.match(r'^(\d+)d$', s)
+    if m:
+        return datetime.utcnow() - timedelta(days=int(m.group(1)))
+    try:
+        return datetime.strptime(s, '%Y-%m-%d')
+    except ValueError:
+        return None
+
+
+def _parse_pubdate(s):
+    """将 pub_date 字符串解析为无时区 datetime，解析失败返回 None。"""
+    if not s:
+        return None
+    # 去掉时区后缀再解析
+    s = re.sub(r'\s*[+-]\d{2}:?\d{2}\s*$', '', s.strip())
+    s = s.rstrip('Z').rstrip('GMT').strip()
+    for fmt in ('%Y-%m-%dT%H:%M:%S', '%a, %d %b %Y %H:%M:%S', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d'):
+        try:
+            return datetime.strptime(s[:19], fmt)
+        except ValueError:
+            continue
+    return None
 
 
 def detect_category(title, default_category):
@@ -141,6 +173,17 @@ def main():
         if idx + 1 < len(sys.argv):
             source_filter = sys.argv[idx + 1].lower()
 
+    # --since 7d 或 --since 2025-01-01 过滤发布时间
+    since_dt = None
+    if '--since' in sys.argv:
+        idx = sys.argv.index('--since')
+        if idx + 1 < len(sys.argv):
+            since_dt = _parse_since(sys.argv[idx + 1])
+            if since_dt:
+                print(f'时间过滤：仅处理 {since_dt.strftime("%Y-%m-%d")} 之后发布的集数')
+            else:
+                print('[警告] --since 格式无法识别，支持 7d 或 YYYY-MM-DD，忽略时间过滤')
+
     if not os.path.exists(SOURCES_FILE):
         print(f'[错误] 找不到配置文件：{SOURCES_FILE}')
         sys.exit(1)
@@ -170,17 +213,23 @@ def main():
             print(f'  ❌ {name}：{e}')
             continue
 
-        new_here = [
-            (t, u, d) for t, u, d in episodes
-            if slugify(t) not in existing_slugs
-        ]
+        new_here = []
+        for t, u, d in episodes:
+            if slugify(t) in existing_slugs:
+                continue
+            if since_dt:
+                pd = _parse_pubdate(d)
+                if pd is not None and pd < since_dt:
+                    continue  # 跳过时间范围外的集数
+            new_here.append((t, u, d))
 
         if new_here:
             print(f'  {name}：{len(new_here)} 集新内容')
+            lock = source.get('lock_category', False)
             for t, u, d in new_here:
-                cat = detect_category(t, default_cat)
+                cat = default_cat if lock else detect_category(t, default_cat)
                 date_str = f'  [{d}]' if d else ''
-                cat_str = f'  →{cat}' if cat != default_cat else f'  [{cat}]'
+                cat_str = f'  [{cat}]' if (lock or cat == default_cat) else f'  →{cat}'
                 print(f'    + {t}{date_str}{cat_str}')
                 all_new.append((t, u, d, name, cat))
         else:
@@ -207,14 +256,12 @@ def main():
 
     os.makedirs(RAW_DIR, exist_ok=True)
     new_slugs = []
-    slug_info = {}  # slug -> (title, category)，用于最终通知
 
     for title, url, pub_date, source_name, category in all_new:
         print(f'[{source_name} / {category}] {title}')
         try:
             slug, char_count = scrape_episode(title, url, pub_date, category)
             new_slugs.append(slug)
-            slug_info[slug] = (title, category)
             print(f'  ✅ raw/{slug}.txt  （{char_count:,} 字符）')
         except Exception as e:
             print(f'  ❌ 抓取失败：{e}')
@@ -250,18 +297,6 @@ def main():
     subprocess.run([sys.executable, 'generator.py'])
 
     print('\n✅ 流水线完成！')
-
-    # ── 第四步：飞书推送通知 ──────────────────────────────────────
-    try:
-        from feishu_notify import notify
-        # 只通知成功生成了纪要的集数（summaries/ 目录中存在对应文件）
-        notified = [
-            slug_info[s] for s in new_slugs
-            if s in slug_info and os.path.exists(os.path.join(SUMMARY_DIR, f'{s}.md'))
-        ]
-        notify(notified)
-    except Exception as e:
-        print(f'[飞书通知] 跳过：{e}')
 
 
 if __name__ == '__main__':

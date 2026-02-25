@@ -237,9 +237,12 @@ def parse_meta_from_md(content):
 
 
 def parse_publish_date_from_md(content):
-    """提取原文发表日期"""
-    match = re.search(r'\*\*原文发表：\*\*\s*(.+)', content)
-    return match.group(1).strip() if match else ''
+    """提取原文发布日期（兼容 **发布日期：** 和 **原文发表：** 两种写法）"""
+    for pattern in (r'\*\*发布日期：\*\*\s*(.+)', r'\*\*原文发表：\*\*\s*(.+)'):
+        match = re.search(pattern, content)
+        if match:
+            return match.group(1).strip()
+    return ''
 
 
 def parse_summary_date_from_md(content):
@@ -425,9 +428,30 @@ def generate_index(entries):
     extra_cats = sorted(c for c in groups if c not in CATEGORY_ORDER)
     all_cats = ordered_cats + extra_cats
 
+    def _date_key(entry):
+        """将发布日期转为 YYYY-MM-DD 字符串用于排序，无法解析的排到最后。"""
+        from datetime import datetime
+        pub = (entry[3] or '').strip()
+        if not pub:
+            return '0000-00-00'
+        # YYYY-MM-DD
+        m = re.match(r'(\d{4}-\d{2}-\d{2})', pub)
+        if m:
+            return m.group(1)
+        # "Feb 13, 2026" / "Feb 6, 2026"
+        for fmt in ('%b %d, %Y', '%B %d, %Y', '%b %d %Y', '%d %b %Y'):
+            try:
+                return datetime.strptime(pub, fmt).strftime('%Y-%m-%d')
+            except ValueError:
+                continue
+        # 兜底：只取年份
+        m = re.search(r'(\d{4})', pub)
+        return (m.group(1) + '-00-00') if m else '0000-00-00'
+
     sections_html = ''
     for cat in all_cats:
-        cat_entries = groups[cat]
+        # 按发布日期从新到旧排序
+        cat_entries = sorted(groups[cat], key=_date_key, reverse=True)
         cards = ''
         for slug, title, meta, publish_date, summary_date, _ in cat_entries:
             date_parts = []
@@ -517,6 +541,33 @@ def main():
 
     print(f'\n索引页  →  {index_path}')
     print(f'\n完成！用浏览器打开 output/index.html 查看结果')
+
+    # 自动部署到 Cloudflare Pages（若 wrangler 可用）
+    _deploy_to_cloudflare()
+
+
+def _deploy_to_cloudflare():
+    """调用 wrangler 将 output/ 部署到 Cloudflare Pages。"""
+    import shutil
+    import subprocess
+    if not shutil.which('wrangler'):
+        return  # wrangler 未安装，跳过
+    print('\n正在部署到 Cloudflare Pages...')
+    result = subprocess.run(
+        ['wrangler', 'pages', 'deploy', OUTPUT_DIR,
+         '--project-name', 'podcast-summary', '--commit-dirty=true'],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        # 从输出中提取 URL
+        for line in (result.stdout + result.stderr).splitlines():
+            if 'pages.dev' in line:
+                print(f'✅ 已部署：{line.strip()}')
+                break
+        else:
+            print('✅ Cloudflare Pages 部署完成')
+    else:
+        print(f'⚠️  Cloudflare 部署失败：{result.stderr[-300:]}')
 
 
 if __name__ == '__main__':

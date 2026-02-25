@@ -16,7 +16,6 @@
 | `auto_summarize.py` | 调用豆包 API 生成 Markdown 纪要 |
 | `generator.py` | 将 `summaries/*.md` 编译为 `output/index.html` |
 | `sources.yaml` | 订阅来源配置（RSS + YouTube 频道） |
-| `feishu_bot.py` | 飞书 Bot HTTP 服务，监听 :8080/feishu |
 | `scrapers/` | 各类抓取器（youtube / substack / generic / rss） |
 | `prompts/summary_template.md` | 纪要生成 prompt 模板 |
 
@@ -52,10 +51,7 @@ python generator.py
 
 ## 环境变量（.env）
 ```
-ARK_API_KEY=...          # 豆包 API Key（必须）
-FEISHU_APP_ID=...        # 飞书 Bot App ID
-FEISHU_APP_SECRET=...    # 飞书 Bot App Secret
-FEISHU_VERIFY_TOKEN=...  # 飞书事件订阅验证 Token
+ARK_API_KEY=...  # 豆包 API Key（必须）
 ```
 
 ## 纪要 Markdown 格式
