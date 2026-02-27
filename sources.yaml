@@ -1,62 +1,39 @@
-# 播客来源配置
-# type: rss             — RSS/Atom Feed（Substack、个人博客等）
-# type: youtube_channel — YouTube 频道（无需 API Key）
-#
-# channel_handle: YouTube @handle（如 aiDotEngineer），程序自动解析为 Channel ID
-# title_filter:   只处理标题含该字符串的视频（不区分大小写），留空则处理全部
-# max_episodes:   每次最多检查多少集（避免首次运行时抓取过多历史内容）
-# category:       默认分类标签；混合来源会按集数标题关键词自动覆盖
-# lock_category:  true = 强制使用 category，不做关键词检测（适合投资/产品等主题固定的播客）
-#
-# 公司关键词自动识别：见 feed_monitor.py 的 COMPANY_PATTERNS
-
 sources:
-
-  # ── RSS 来源 ──────────────────────────────────────────────────
-
-  - name: "Latent Space"
-    type: rss
-    feed_url: "https://www.latent.space/feed"
-    max_episodes: 3
-    category: "AI 资讯"       # 混合来源，会被关键词检测覆盖
-
-  - name: "Lex Fridman Podcast"
-    type: rss
-    feed_url: "https://lexfridman.com/feed/podcast/"
-    max_episodes: 3
-    category: "访谈"          # 混合来源，会被关键词检测覆盖
-
-  - name: "Dwarkesh Podcast"
-    type: rss
-    feed_url: "https://www.dwarkesh.com/feed"
-    max_episodes: 3
-    category: "访谈"          # 混合来源，会被关键词检测覆盖
-
-  # ── YouTube 频道 ──────────────────────────────────────────────
-
-  - name: "AI Engineer"
-    type: youtube_channel
-    channel_handle: "aiDotEngineer"
-    max_episodes: 3
-    category: "AI 工程"
-
-  - name: "YC Lightcone"
-    type: youtube_channel
-    channel_handle: "ycombinator"
-    title_filter: "Lightcone"
-    max_episodes: 3
-    category: "创投"          # 混合来源，会被关键词检测覆盖
-
-  - name: "Lenny's Podcast"
-    type: youtube_channel
-    channel_handle: "LennysPodcast"
-    max_episodes: 3
-    category: "产品"
-    lock_category: true
-
-  - name: "Invest Like the Best"
-    type: youtube_channel
-    channel_handle: "ILTB_Podcast"
-    max_episodes: 3
-    category: "投资"
-    lock_category: true
+- category: AI 资讯
+  feed_url: https://www.latent.space/feed
+  max_episodes: 3
+  name: Latent Space
+  type: rss
+- category: 访谈
+  feed_url: https://lexfridman.com/feed/podcast/
+  max_episodes: 3
+  name: Lex Fridman Podcast
+  type: rss
+- category: 访谈
+  feed_url: https://www.dwarkesh.com/feed
+  max_episodes: 3
+  name: Dwarkesh Podcast
+  type: rss
+- category: AI 工程
+  channel_handle: aiDotEngineer
+  max_episodes: 3
+  name: AI Engineer
+  type: youtube_channel
+- category: 创投
+  channel_handle: ycombinator
+  max_episodes: 3
+  name: YC Lightcone
+  title_filter: Lightcone
+  type: youtube_channel
+- category: 产品
+  channel_handle: LennysPodcast
+  lock_category: true
+  max_episodes: 3
+  name: Lenny's Podcast
+  type: youtube_channel
+- category: 投资
+  channel_handle: ILTB_Podcast
+  lock_category: true
+  max_episodes: 3
+  name: Invest Like the Best
+  type: youtube_channel

@@ -4,6 +4,7 @@ YouTube 字幕抓取模块 + 频道集数发现
 - list_channel_episodes()  从频道 RSS 获取最新视频列表，无需 API Key
 """
 import re
+import sys
 import requests
 from bs4 import BeautifulSoup
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -249,6 +250,7 @@ def resolve_channel_id(handle_or_id):
 def list_channel_episodes(handle_or_id, max_count=5, title_filter=''):
     """
     从 YouTube 频道 RSS 获取最新视频列表，无需 API Key。
+    RSS 失败（如频道 Feed 返回 404）时自动回退到 yt-dlp。
     返回：[(title, url, pub_date_str), ...]
     title_filter：若设置，只返回标题含该字符串的视频（不区分大小写）
     """
@@ -259,7 +261,13 @@ def list_channel_episodes(handle_or_id, max_count=5, title_filter=''):
 
     # YouTube 频道 Atom feed 的条目比实际需要的多，先多取再过滤
     fetch_count = max_count if not title_filter else max_count * 10
-    episodes = fetch_episodes(feed_url, fetch_count)
+
+    try:
+        episodes = fetch_episodes(feed_url, fetch_count)
+    except RuntimeError:
+        # RSS Feed 不可用（常见于部分大频道），回退到 yt-dlp 列举
+        print(f'  [提示] RSS Feed 不可用，改用 yt-dlp 列举频道视频...')
+        episodes = _list_channel_via_ytdlp(handle_or_id, fetch_count)
 
     if title_filter:
         episodes = [
@@ -268,3 +276,48 @@ def list_channel_episodes(handle_or_id, max_count=5, title_filter=''):
         ]
 
     return episodes[:max_count]
+
+
+def _list_channel_via_ytdlp(handle_or_id, max_count):
+    """
+    用 yt-dlp --flat-playlist 列出频道最新视频。
+    返回：[(title, url, pub_date_str), ...]  pub_date_str 可能为空字符串。
+    """
+    import subprocess
+    from datetime import datetime as dt
+
+    handle = handle_or_id.lstrip('@')
+    channel_url = f'https://www.youtube.com/@{handle}/videos'
+
+    result = subprocess.run(
+        [
+            sys.executable, '-m', 'yt_dlp',
+            '--flat-playlist',
+            '--playlist-end', str(max_count),
+            '--print', '%(title)s\t%(url)s\t%(upload_date)s',
+            channel_url,
+        ],
+        capture_output=True, text=True, timeout=60,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f'yt-dlp 列出频道视频失败：{result.stderr[-300:]}'
+        )
+
+    episodes = []
+    for line in result.stdout.strip().splitlines():
+        parts = line.split('\t')
+        if len(parts) < 2:
+            continue
+        title = parts[0].strip()
+        url = parts[1].strip()
+        pub_date = ''
+        if len(parts) >= 3 and parts[2].strip() not in ('', 'NA'):
+            try:
+                pub_date = dt.strptime(parts[2].strip(), '%Y%m%d').strftime('%b %d, %Y')
+            except ValueError:
+                pass
+        if title and url:
+            episodes.append((title, url, pub_date))
+
+    return episodes

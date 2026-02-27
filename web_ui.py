@@ -192,6 +192,52 @@ def api_sources_add():
         return jsonify({'ok': False, 'error': str(e)}), 500
 
 
+@app.route('/api/sources/<path:name>', methods=['PUT'])
+def api_sources_update(name):
+    """更新指定来源的配置"""
+    data = request.get_json(force=True, silent=True) or {}
+    new_name = data.get('name', '').strip()
+    stype = data.get('type', '').strip()
+
+    if not new_name or stype not in ('rss', 'youtube_channel'):
+        return jsonify({'ok': False, 'error': '缺少 name 或 type 字段'}), 400
+
+    try:
+        with open('sources.yaml', encoding='utf-8') as f:
+            config = yaml.safe_load(f) or {}
+        sources = config.get('sources', [])
+
+        idx = next((i for i, s in enumerate(sources) if s.get('name') == name), None)
+        if idx is None:
+            return jsonify({'ok': False, 'error': f'找不到来源：{name}'}), 404
+
+        if new_name != name and any(s.get('name') == new_name for s in sources):
+            return jsonify({'ok': False, 'error': f'来源名称 "{new_name}" 已存在'}), 400
+
+        entry = {'name': new_name, 'type': stype}
+        if stype == 'rss':
+            entry['feed_url'] = data.get('feed_url', '').strip()
+        else:
+            entry['channel_handle'] = data.get('channel_handle', '').strip()
+            if data.get('title_filter', '').strip():
+                entry['title_filter'] = data['title_filter'].strip()
+
+        entry['max_episodes'] = int(data.get('max_episodes', 3))
+        entry['category'] = data.get('category', '其他').strip()
+        if data.get('lock_category'):
+            entry['lock_category'] = True
+
+        sources[idx] = entry
+        config['sources'] = sources
+
+        with open('sources.yaml', 'w', encoding='utf-8') as f:
+            yaml.dump(config, f, allow_unicode=True, default_flow_style=False)
+
+        return jsonify({'ok': True})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+
 @app.route('/api/sources/<path:name>', methods=['DELETE'])
 def api_sources_delete(name):
     """从 sources.yaml 删除指定来源"""
@@ -523,9 +569,9 @@ tr:last-child td{border-bottom:none}
       </tbody>
     </table>
 
-    <!-- 添加新来源表单 -->
+    <!-- 添加/编辑来源表单 -->
     <div class="add-form" id="add-form">
-      <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#333">添加新来源</div>
+      <div id="add-form-title" style="font-size:13px;font-weight:600;margin-bottom:12px;color:#333">添加新来源</div>
 
       <div class="form-row">
         <label>名称</label>
@@ -573,7 +619,7 @@ tr:last-child td{border-bottom:none}
 
       <div class="btn-row" style="justify-content:flex-end">
         <button class="btn btn-ghost" onclick="toggleAddForm()">取消</button>
-        <button class="btn btn-primary" onclick="submitAddSource()">保存</button>
+        <button class="btn btn-primary" id="add-form-submit" onclick="submitAddSource()">保存</button>
       </div>
       <div id="add-error" style="color:#c62828;font-size:12px;margin-top:8px"></div>
     </div>
@@ -735,6 +781,8 @@ function runPipeline(cmd) {
 
 // ── 来源管理
 let _sources = [];
+let _editingName = null;   // null = 新增模式；字符串 = 正在编辑的来源名称
+
 function loadSources() {
   fetch('/api/sources').then(r=>r.json()).then(d => {
     _sources = d.sources || [];
@@ -759,14 +807,58 @@ function renderSources() {
       <td>${esc(s.category||'—')}</td>
       <td style="text-align:center">${s.max_episodes||'—'}</td>
       <td>${detail}</td>
-      <td><button class="btn btn-red" onclick="deleteSource('${esc(s.name||'')}')">删除</button></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 10px;margin-right:4px" onclick="editSource('${esc(s.name||'')}')">编辑</button>
+        <button class="btn btn-red" onclick="deleteSource('${esc(s.name||'')}')">删除</button>
+      </td>
     </tr>`;
   }).join('');
 }
+function _resetAddForm() {
+  _editingName = null;
+  document.getElementById('add-form-title').textContent = '添加新来源';
+  document.getElementById('add-form-submit').textContent = '保存';
+  document.getElementById('add-name').value = '';
+  document.getElementById('add-feed-url').value = '';
+  document.getElementById('add-handle').value = '';
+  document.getElementById('add-filter').value = '';
+  document.getElementById('add-category').value = '';
+  document.getElementById('add-max').value = '3';
+  document.getElementById('add-lock-category').checked = false;
+  document.querySelectorAll('input[name=add-type]').forEach(r => r.checked = false);
+  document.getElementById('cond-rss').style.display = 'none';
+  document.getElementById('cond-yt').style.display = 'none';
+  document.getElementById('add-error').textContent = '';
+}
 function toggleAddForm() {
   const f = document.getElementById('add-form');
+  const willOpen = !f.classList.contains('visible');
+  if (!willOpen) _resetAddForm();
   f.classList.toggle('visible');
+  if (!willOpen) document.getElementById('add-error').textContent = '';
+}
+function editSource(name) {
+  const s = _sources.find(x => x.name === name);
+  if (!s) return;
+  _editingName = name;
+  document.getElementById('add-form-title').textContent = `编辑来源：${name}`;
+  document.getElementById('add-form-submit').textContent = '保存修改';
+  document.getElementById('add-name').value = s.name || '';
+  document.getElementById('add-category').value = s.category || '';
+  document.getElementById('add-max').value = s.max_episodes || 3;
+  document.getElementById('add-lock-category').checked = !!s.lock_category;
+  // 设置类型单选框
+  const radio = document.querySelector(`input[name=add-type][value="${s.type}"]`);
+  if (radio) { radio.checked = true; onTypeChange(); }
+  if (s.type === 'rss') {
+    document.getElementById('add-feed-url').value = s.feed_url || '';
+  } else {
+    document.getElementById('add-handle').value = s.channel_handle || '';
+    document.getElementById('add-filter').value = s.title_filter || '';
+  }
   document.getElementById('add-error').textContent = '';
+  document.getElementById('add-form').classList.add('visible');
+  document.getElementById('add-form').scrollIntoView({behavior: 'smooth', block: 'nearest'});
 }
 function onTypeChange() {
   const val = document.querySelector('input[name=add-type]:checked')?.value;
@@ -794,24 +886,18 @@ function submitAddSource() {
     const f = document.getElementById('add-filter').value.trim();
     if (f) body.title_filter = f;
   }
-  fetch('/api/sources', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
+  const isEdit = _editingName !== null;
+  const url = isEdit
+    ? '/api/sources/' + encodeURIComponent(_editingName)
+    : '/api/sources';
+  fetch(url, {method: isEdit ? 'PUT' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
     .then(r=>r.json()).then(d => {
       if (d.ok) {
-        toggleAddForm();
-        // reset form
-        document.getElementById('add-name').value = '';
-        document.getElementById('add-feed-url').value = '';
-        document.getElementById('add-handle').value = '';
-        document.getElementById('add-filter').value = '';
-        document.getElementById('add-category').value = '';
-        document.getElementById('add-max').value = '3';
-        document.getElementById('add-lock-category').checked = false;
-        document.querySelectorAll('input[name=add-type]').forEach(r => r.checked = false);
-        document.getElementById('cond-rss').style.display = 'none';
-        document.getElementById('cond-yt').style.display = 'none';
+        _resetAddForm();
+        document.getElementById('add-form').classList.remove('visible');
         loadSources(); refreshStats();
       } else {
-        errEl.textContent = d.error || '添加失败';
+        errEl.textContent = d.error || (isEdit ? '保存失败' : '添加失败');
       }
     });
 }
