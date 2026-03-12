@@ -64,12 +64,16 @@ def main():
     scrape_only = args.scrape_only
     env = {**os.environ, 'PYTHONUNBUFFERED': '1'}
 
-    print(f'URL：{url}', flush=True)
+    is_local = os.path.isfile(url)
+    print(f'{"文件" if is_local else "URL"}：{url}', flush=True)
 
     # ① 获取标题
     if not title:
-        print('正在提取标题...', flush=True)
-        title = fetch_title(url)
+        if is_local:
+            title = os.path.splitext(os.path.basename(url))[0]
+        else:
+            print('正在提取标题...', flush=True)
+            title = fetch_title(url)
     if not title:
         title = url.rstrip('/').split('/')[-1] or 'untitled'
     print(f'标题：{title}', flush=True)

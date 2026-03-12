@@ -29,7 +29,7 @@ app = Flask(__name__)
 
 ENV_FILE = os.path.join(APP_DIR, '.env')
 # 允许通过界面配置的 Key（白名单，防止意外覆盖其他变量）
-CONFIGURABLE_KEYS = ('ARK_API_KEY',)
+CONFIGURABLE_KEYS = ('ARK_API_KEY', 'CLOUDFLARE_API_TOKEN', 'BROWSER_COOKIES')
 
 
 def _load_env_on_startup():
@@ -259,6 +259,25 @@ def api_sources_delete(name):
         return jsonify({'ok': False, 'error': str(e)}), 500
 
 
+@app.route('/api/summaries/<path:slug>', methods=['DELETE'])
+def api_summary_delete(slug):
+    """删除指定纪要的 .md 和 .html 文件（不含重建，重建由前端单独触发）。"""
+    import re
+    if not re.match(r'^[\w\-]+$', slug):
+        return jsonify({'ok': False, 'error': '非法 slug'}), 400
+    md_path = os.path.join('summaries', f'{slug}.md')
+    html_path = os.path.join('output', f'{slug}.html')
+    if not os.path.exists(md_path):
+        return jsonify({'ok': False, 'error': '纪要不存在'}), 404
+    try:
+        os.remove(md_path)
+        if os.path.exists(html_path):
+            os.remove(html_path)
+        return jsonify({'ok': True})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+
 @app.route('/api/summaries')
 def api_summaries():
     try:
@@ -360,6 +379,12 @@ def run_scrape():
 @app.get('/api/run/process')
 def run_process():
     return _stream_subprocess(_pipeline_args([PYTHON, 'feed_monitor.py']))
+
+
+@app.get('/api/run/rebuild')
+def run_rebuild():
+    """仅重建 HTML 并部署（不抓取新内容）。"""
+    return _stream_subprocess([PYTHON, 'generator.py'])
 
 
 @app.post('/api/run/url')
@@ -632,11 +657,15 @@ tr:last-child td{border-bottom:none}
     <div class="card-title">已生成纪要</div>
     <div class="cat-bar" id="cat-bar"></div>
     <table>
-      <thead><tr><th>#</th><th>标题</th><th>分类</th><th>发布日期</th></tr></thead>
+      <thead><tr><th>#</th><th>标题</th><th>分类</th><th>发布日期</th><th></th></tr></thead>
       <tbody id="summaries-body">
-        <tr><td colspan="4" class="empty">加载中...</td></tr>
+        <tr><td colspan="5" class="empty">加载中...</td></tr>
       </tbody>
     </table>
+  </div>
+  <div class="card" id="delete-log-card" style="display:none">
+    <div class="card-title">删除 &amp; 部署进度</div>
+    <div class="log" id="log-delete">准备中...</div>
   </div>
 </div>
 
@@ -662,6 +691,46 @@ tr:last-child td{border-bottom:none}
             placeholder="填写新 Key（留空则不修改）" autocomplete="off" />
           <button class="btn btn-ghost" style="white-space:nowrap"
             onclick="toggleArkVisible()">显示</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #f0f0f0;margin:20px 0"></div>
+
+    <div class="form-row" style="align-items:flex-start;gap:12px">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">BROWSER_COOKIES
+          <span id="bc-status" style="font-size:11px;font-weight:400;margin-left:8px;color:#aaa">检测中…</span>
+        </div>
+        <div style="font-size:12px;color:#aaa;margin-bottom:8px">
+          处理需要登录的视频页面（NVIDIA on-demand、Kaltura 等）时，yt-dlp 会读取该浏览器的 Cookie 自动鉴权。<br>
+          填写浏览器名称：<code>safari</code>（推荐，macOS 默认）、<code>chrome</code>、<code>firefox</code><br>
+          留空则不使用 Cookie（公开内容无需设置）。
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="bc-input" class="grow"
+            placeholder="safari（留空则不修改）" autocomplete="off" />
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #f0f0f0;margin:20px 0"></div>
+
+    <div class="form-row" style="align-items:flex-start;gap:12px">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">CLOUDFLARE_API_TOKEN
+          <span id="cf-status" style="font-size:11px;font-weight:400;margin-left:8px;color:#aaa">检测中…</span>
+        </div>
+        <div style="font-size:12px;color:#aaa;margin-bottom:8px">
+          Cloudflare API Token，处理完成后自动部署到 Pages 时必须填写。<br>
+          获取地址：<a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank">Cloudflare → My Profile → API Tokens</a><br>
+          创建 Token 时选择模板「Edit Cloudflare Pages」或手动添加权限：<code>Cloudflare Pages:Edit</code>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="password" id="cf-key-input" class="grow"
+            placeholder="填写新 Token（留空则不修改）" autocomplete="off" />
+          <button class="btn btn-ghost" style="white-space:nowrap"
+            onclick="toggleCfVisible()">显示</button>
         </div>
       </div>
     </div>
@@ -935,7 +1004,7 @@ function renderSummaries() {
     ? _allSummaries
     : _allSummaries.filter(s => s.category === _activeCategory);
   const tb = document.getElementById('summaries-body');
-  if (!list.length) { tb.innerHTML = '<tr><td colspan="4" class="empty">暂无纪要</td></tr>'; return; }
+  if (!list.length) { tb.innerHTML = '<tr><td colspan="5" class="empty">暂无纪要</td></tr>'; return; }
   tb.innerHTML = list.map((s, i) => `
     <tr>
       <td style="color:#ccc;width:36px;font-size:12px">${list.length - i}</td>
@@ -946,7 +1015,31 @@ function renderSummaries() {
       </td>
       <td><span class="badge badge-blue">${esc(s.category||'—')}</span></td>
       <td style="font-size:12px;color:#888;white-space:nowrap">${esc(s.date||'—')}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-red" onclick="deleteSummary('${esc(s.slug)}','${esc(s.title)}')">删除</button>
+      </td>
     </tr>`).join('');
+}
+function deleteSummary(slug, title) {
+  if (!confirm(`确定删除「${title}」？\n\n将同时删除纪要文件并重新部署到 Cloudflare。`)) return;
+  const logCard = document.getElementById('delete-log-card');
+  const logEl = document.getElementById('log-delete');
+  logCard.style.display = '';
+  logEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+  // 先删文件
+  fetch('/api/summaries/' + encodeURIComponent(slug), {method:'DELETE'})
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok) { appendLog(logEl, '❌ 删除失败：' + d.error); return; }
+      appendLog(logEl, `✅ 已删除：${slug}`);
+      appendLog(logEl, '正在重建并部署...');
+      // 触发重建 HTML + 部署到 Cloudflare（只跑 generator.py）
+      streamGet('/api/run/rebuild', logEl, () => {
+        loadSummaries();
+        refreshStats();
+      });
+    })
+    .catch(e => appendLog(logEl, '❌ ' + e));
 }
 
 // ── 设置
@@ -954,13 +1047,31 @@ function loadSettings() {
   fetch('/api/settings').then(r=>r.json()).then(d => {
     if (!d.ok) return;
     const ark = d.settings['ARK_API_KEY'];
-    const el = document.getElementById('ark-status');
+    const arkEl = document.getElementById('ark-status');
     if (ark && ark.set) {
-      el.textContent = '✓ 已设置 ' + ark.hint;
-      el.style.color = '#34a853';
+      arkEl.textContent = '✓ 已设置 ' + ark.hint;
+      arkEl.style.color = '#34a853';
     } else {
-      el.textContent = '⚠ 未设置';
-      el.style.color = '#ea8600';
+      arkEl.textContent = '⚠ 未设置';
+      arkEl.style.color = '#ea8600';
+    }
+    const cf = d.settings['CLOUDFLARE_API_TOKEN'];
+    const cfEl = document.getElementById('cf-status');
+    if (cf && cf.set) {
+      cfEl.textContent = '✓ 已设置 ' + cf.hint;
+      cfEl.style.color = '#34a853';
+    } else {
+      cfEl.textContent = '⚠ 未设置（部署将跳过）';
+      cfEl.style.color = '#ea8600';
+    }
+    const bc = d.settings['BROWSER_COOKIES'];
+    const bcEl = document.getElementById('bc-status');
+    if (bc && bc.set) {
+      bcEl.textContent = '✓ 已设置：' + bc.hint;
+      bcEl.style.color = '#34a853';
+    } else {
+      bcEl.textContent = '未设置（仅公开内容可用）';
+      bcEl.style.color = '#aaa';
     }
   });
 }
@@ -970,19 +1081,33 @@ function toggleArkVisible() {
   if (inp.type === 'password') { inp.type = 'text';  btn.textContent = '隐藏'; }
   else                         { inp.type = 'password'; btn.textContent = '显示'; }
 }
+function toggleCfVisible() {
+  const inp = document.getElementById('cf-key-input');
+  const btn = event.target;
+  if (inp.type === 'password') { inp.type = 'text';  btn.textContent = '隐藏'; }
+  else                         { inp.type = 'password'; btn.textContent = '显示'; }
+}
 function saveSettings() {
-  const key = document.getElementById('ark-key-input').value.trim();
+  const arkKey = document.getElementById('ark-key-input').value.trim();
+  const cfKey  = document.getElementById('cf-key-input').value.trim();
+  const bcVal  = document.getElementById('bc-input').value.trim();
   const msg = document.getElementById('settings-msg');
-  if (!key) { msg.style.color='#ea8600'; msg.textContent = '未填写任何 Key，无需保存。'; return; }
+  if (!arkKey && !cfKey && !bcVal) { msg.style.color='#ea8600'; msg.textContent = '未填写任何字段，无需保存。'; return; }
+  const body = {};
+  if (arkKey) body.ARK_API_KEY = arkKey;
+  if (cfKey)  body.CLOUDFLARE_API_TOKEN = cfKey;
+  if (bcVal)  body.BROWSER_COOKIES = bcVal;
   fetch('/api/settings', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ARK_API_KEY: key}),
+    body: JSON.stringify(body),
   }).then(r=>r.json()).then(d => {
     if (d.ok) {
       msg.style.color = '#34a853';
       msg.textContent = '✅ 保存成功，已立即生效。';
       document.getElementById('ark-key-input').value = '';
+      document.getElementById('cf-key-input').value = '';
+      document.getElementById('bc-input').value = '';
       loadSettings();
     } else {
       msg.style.color = '#c62828';

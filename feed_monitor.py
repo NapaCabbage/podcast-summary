@@ -20,6 +20,8 @@ import sys
 import yaml
 from datetime import datetime, timedelta
 from scrapers import youtube, substack, generic
+from scrapers import audio as audio_scraper
+from scrapers.audio import is_media_url
 from scrapers.rss import fetch_episodes
 from scrapers.youtube import list_channel_episodes
 
@@ -100,11 +102,15 @@ def get_existing_slugs():
 
 
 def detect_type(url):
+    if os.path.isfile(url):
+        return 'audio'
     if 'youtube.com' in url or 'youtu.be' in url:
         return 'youtube'
     substack_domains = ['substack.com', 'dwarkesh.com', 'latent.space']
     if any(d in url for d in substack_domains) or '/p/' in url:
         return 'substack'
+    if is_media_url(url):
+        return 'audio'
     return 'generic'
 
 
@@ -119,6 +125,9 @@ def scrape_episode(title, url, pub_date, category=''):
         text, scraped_date = youtube.scrape(url)
     elif site_type == 'substack':
         text, scraped_date = substack.scrape(url)
+    elif site_type == 'audio':
+        cookies = os.environ.get('BROWSER_COOKIES', '').strip() or None
+        text, scraped_date = audio_scraper.scrape(url, cookies_from_browser=cookies)
     else:
         text, scraped_date = generic.scrape(url)
 

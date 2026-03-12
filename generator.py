@@ -7,6 +7,19 @@ import os
 import re
 import markdown
 
+# 从 .env 加载环境变量（不覆盖已有系统环境变量）
+_ENV_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+try:
+    with open(_ENV_FILE, encoding='utf-8') as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith('#') and '=' in _line:
+                _k, _v = _line.split('=', 1)
+                if _k.strip() not in os.environ:
+                    os.environ[_k.strip()] = _v.strip().strip('"').strip("'")
+except FileNotFoundError:
+    pass
+
 SUMMARY_DIR = 'summaries'
 OUTPUT_DIR = 'output'
 
@@ -547,19 +560,44 @@ def main():
 
 
 def _deploy_to_cloudflare():
-    """调用 wrangler 将 output/ 部署到 Cloudflare Pages。"""
+    """调用 wrangler 将 output/ 部署到 Cloudflare Pages。
+
+    用 CLOUDFLARE_API_TOKEN 作为 wrangler 的鉴权凭据，无需 wrangler login。
+    wrangler 优先从系统 PATH 查找；若未找到，则在 nvm 安装路径中搜索。
+    """
+    import glob as _glob
     import shutil
     import subprocess
-    if not shutil.which('wrangler'):
-        return  # wrangler 未安装，跳过
-    print('\n正在部署到 Cloudflare Pages...')
+
+    api_token = os.environ.get('CLOUDFLARE_API_TOKEN', '').strip()
+    if not api_token:
+        print('\n⚠️  未设置 CLOUDFLARE_API_TOKEN，跳过 Cloudflare 部署。'
+              '\n   请在 Web UI 设置页填写 Token 后重试。')
+        return
+
+    # 查找 wrangler：PATH → nvm 安装目录（取版本号最大的）
+    wrangler = shutil.which('wrangler')
+    if not wrangler:
+        nvm_bin = os.path.expanduser('~/.nvm/versions/node')
+        candidates = sorted(_glob.glob(os.path.join(nvm_bin, '*/bin/wrangler')))
+        if candidates:
+            wrangler = candidates[-1]
+    if not wrangler:
+        print('\n⚠️  未找到 wrangler，跳过 Cloudflare 部署。'
+              '\n   请运行：npm install -g wrangler')
+        return
+
+    print(f'\n正在部署到 Cloudflare Pages...')
+    node_bin = os.path.dirname(wrangler)  # wrangler 同目录下有 node
+    env = {**os.environ,
+           'CLOUDFLARE_API_TOKEN': api_token,
+           'PATH': node_bin + os.pathsep + os.environ.get('PATH', '')}
     result = subprocess.run(
-        ['wrangler', 'pages', 'deploy', OUTPUT_DIR,
+        [wrangler, 'pages', 'deploy', OUTPUT_DIR,
          '--project-name', 'podcast-summary', '--commit-dirty=true'],
-        capture_output=True, text=True,
+        capture_output=True, text=True, env=env,
     )
     if result.returncode == 0:
-        # 从输出中提取 URL
         for line in (result.stdout + result.stderr).splitlines():
             if 'pages.dev' in line:
                 print(f'✅ 已部署：{line.strip()}')
@@ -567,7 +605,7 @@ def _deploy_to_cloudflare():
         else:
             print('✅ Cloudflare Pages 部署完成')
     else:
-        print(f'⚠️  Cloudflare 部署失败：{result.stderr[-300:]}')
+        print(f'⚠️  Cloudflare 部署失败：{result.stderr[-400:]}')
 
 
 if __name__ == '__main__':
